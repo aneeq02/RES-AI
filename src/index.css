@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+body {
+  background-color: black;
+  color: white;
+  -webkit-font-smoothing: antialiased;
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+/* Updated for better opacity and stacking */
+.glass-panel {
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.text-gradient {
+  background: linear-gradient(to right, #ffffff, #a1a1aa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Review Animation Marquee */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 30s linear infinite;
+}

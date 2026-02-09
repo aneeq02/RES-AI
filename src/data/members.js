@@ -1,0 +1,14 @@
+export const members = [
+  { id: "soshie", name: "Soshie", role: "Social Media Manager", price: 49, color: "from-purple-500 to-pink-500", description: "Soshie automates your content calendar, engages with followers, and analyzes trends to grow your brand's presence 24/7." },
+  { id: "cassie", name: "Cassie", role: "Customer Support", price: 59, color: "from-blue-500 to-indigo-500", description: "Cassie crafts expertly tailored responses to customer queries while maintaining your brand’s customer value." },
+  { id: "dexter", name: "Dexter", role: "Data Analyst", price: 89, color: "from-orange-400 to-red-500", description: "Dexter processes complex data sets to provide actionable business intelligence and growth forecasts." },
+  { id: "buddy", name: "Buddy", role: "Business Strategist", price: 99, color: "from-blue-400 to-cyan-500", description: "Buddy provides deep business insights, market analysis, and growth strategies to ensure your success." },
+  { id: "emmie", name: "Emmie", role: "Email Marketer", price: 45, color: "from-yellow-400 to-amber-600", description: "Emmie designs high-converting email sequences and manages subscriber segments to maximize ROI." },
+  { id: "gigi", name: "Gigi", role: "Personal Growth", price: 39, color: "from-green-400 to-emerald-600", description: "Gigi helps optimize your daily routines and focuses on personal productivity and mindset coaching." },
+  { id: "scouty", name: "Scouty", role: "Recruiter", price: 120, color: "from-teal-400 to-blue-500", description: "Scouty identifies top talent and automates the initial screening process for your open positions." },
+  { id: "penn", name: "Penn", role: "Copywriter", price: 55, color: "from-emerald-400 to-green-600", description: "Penn writes persuasive copy for ads, websites, and blogs that resonates with your target audience." },
+  { id: "commet", name: "Commet", role: "eCom Specialist", price: 75, color: "from-orange-500 to-orange-700", description: "Commet optimizes your online store, manages inventory alerts, and analyzes buyer behavior." },
+  { id: "milli", name: "Milli", role: "Sales Strategist", price: 85, color: "from-pink-500 to-rose-600", description: "Milli uses business insights to craft cold call scripts and persuasive closing tactics." },
+  { id: "seomi", name: "Seomi", role: "SEO Mastermind", price: 65, color: "from-lime-400 to-green-500", description: "Seomi boosts your search engine rankings through keyword optimization and backlink strategies." },
+  { id: "vizzy", name: "Vizzy", role: "Virtual Assistant", price: 35, color: "from-yellow-300 to-orange-400", description: "Vizzy handles your scheduling, emails, and administrative tasks so you can focus on big-picture goals." }
+];
