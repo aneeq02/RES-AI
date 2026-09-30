@@ -64,6 +64,11 @@ export default function MobileMenu({ isOpen, onClose, onOpenGetStarted }) {
                 </NavLink>
               </motion.li>
             ))}
+            <motion.li variants={item}>
+              <NavLink to="/login" className={bigLink}>
+                Sign in
+              </NavLink>
+            </motion.li>
           </motion.ul>
 
           <div className="mt-auto pt-10">

@@ -148,6 +148,10 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Static link, no auth state: renders the same on the server and the client. */}
+            <NavLink to="/login" className={(s) => `${linkClass(s)} mr-3 hidden text-xs font-bold uppercase tracking-[0.14em] lg:inline-flex`}>
+              Sign in
+            </NavLink>
             <button type="button" onClick={openGetStarted} className="btn-primary hidden min-h-11 px-6 py-2.5 text-xs lg:inline-flex">
               Get Started
             </button>
