@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowRight, CircleCheck, Sparkles } from "lucide-react";
+import { ArrowRight, CircleCheck, Clock, Sparkles } from "lucide-react";
 import AgentAvatar from "../../components/agents/AgentAvatar";
 import { members } from "../../data/members";
-import { hasActivePlan, useMe } from "../../context/MeContext";
+import { useMe } from "../../context/MeContext";
 import { api } from "../../lib/api";
+import { hasActivePlan, subscriptionNeedsPayment } from "../../lib/subscription";
+import PaymentIssueNotice from "../../components/billing/PaymentIssueNotice";
 
 // Rollout order is alphabetical by agent name.
 const ROLLOUT = [...members].sort((a, b) => a.name.localeCompare(b.name));
@@ -14,33 +16,60 @@ export default function Team() {
   const [params, setParams] = useSearchParams();
   const [notice, setNotice] = useState(null);
   const synced = useRef(false);
+  // Guards for the async sync below: don't touch state or the URL once this page is gone
+  // or the URL has moved on. A mount-scoped ref (not a per-run flag) so StrictMode's effect
+  // re-run, which the `synced` guard skips, doesn't cancel the one sync in flight.
+  const mounted = useRef(false);
+  const latestParams = useRef(params);
   const live = new Set((me?.agents ?? []).map((a) => a.id));
   const planActive = hasActivePlan(me);
+  const needsPayment = subscriptionNeedsPayment(me);
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => { mounted.current = false; };
+  }, []);
+  useEffect(() => { latestParams.current = params; }, [params]);
 
   // Returning from Stripe Checkout: confirm the session so access doesn't wait on the webhook.
   useEffect(() => {
     const sessionId = params.get("session_id");
     if (params.get("checkout") !== "success" || !sessionId || synced.current) return;
     synced.current = true;
-    api("/billing/sync", { method: "POST", body: { sessionId } })
-      .then(() => refresh())
-      .then(() => setNotice("You're all set. Your team is ready to work."))
-      .catch(() => setNotice("Payment received. It can take a minute to activate; refresh shortly."))
-      .finally(() => setParams({}, { replace: true }));
+    (async () => {
+      let ready = false;
+      try {
+        const res = await api("/billing/sync", { method: "POST", body: { sessionId } });
+        if (res?.ok === true) ready = hasActivePlan(await refresh());
+      } catch {
+        // Fall through to the neutral message: the webhook will still activate the plan.
+      }
+      if (!mounted.current) return;
+      setNotice(ready
+        ? { tone: "success", text: "You're all set. Your team is ready to work." }
+        : { tone: "pending", text: "Payment received, activating… This can take a minute; refresh shortly." });
+      if (latestParams.current.get("session_id") === sessionId) setParams({}, { replace: true });
+    })();
   }, [params, setParams, refresh]);
 
   return (
     <div>
-      {notice && (
+      {notice?.tone === "success" && (
         <p role="status" className="mb-6 flex items-center gap-2 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200">
-          <CircleCheck size={18} aria-hidden="true" /> {notice}
+          <CircleCheck size={18} aria-hidden="true" /> {notice.text}
         </p>
       )}
-      {!planActive && (
+      {notice?.tone === "pending" && (
+        <p role="status" className="mb-6 flex items-center gap-2 rounded-2xl border border-line bg-surface-2 px-4 py-3 text-sm text-muted">
+          <Clock size={18} aria-hidden="true" /> {notice.text}
+        </p>
+      )}
+      {needsPayment && <PaymentIssueNotice className="mb-8" />}
+      {!planActive && !needsPayment && (
         <div className="card mb-8 flex flex-col items-start justify-between gap-4 p-6 sm:flex-row sm:items-center">
           <div>
             <p className="font-bold">Choose a plan to put your team to work</p>
-            <p className="mt-1 text-sm text-muted">Every plan includes the full team, monthly task credits and unlimited chat.</p>
+            <p className="mt-1 text-sm text-muted">Every plan includes each specialist as they launch, monthly task credits and unlimited chat.</p>
           </div>
           <Link to="/checkout" className="btn-primary shrink-0">Choose a plan <ArrowRight size={18} aria-hidden="true" /></Link>
         </div>

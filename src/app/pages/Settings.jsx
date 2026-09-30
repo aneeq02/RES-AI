@@ -3,8 +3,11 @@ import { Link } from "react-router-dom";
 import { ExternalLink } from "lucide-react";
 import ProfileForm, { toForm } from "../components/ProfileForm";
 import { formatDate } from "../components/CreditsMeter";
-import { hasActivePlan, useMe } from "../../context/MeContext";
+import { useMe } from "../../context/MeContext";
 import { api } from "../../lib/api";
+import { openBillingPortal } from "../../lib/billing";
+import { hasActivePlan, subscriptionNeedsPayment } from "../../lib/subscription";
+import PaymentIssueNotice from "../../components/billing/PaymentIssueNotice";
 import { getPlan } from "../../data/plans";
 
 export default function Settings() {
@@ -21,8 +24,7 @@ export default function Settings() {
 
   const openPortal = async () => {
     try {
-      const { url } = await api("/billing/portal", { method: "POST" });
-      window.location.assign(url);
+      await openBillingPortal();
     } catch {
       setPortalError("Billing isn't available yet. Choose a plan first.");
     }
@@ -40,7 +42,9 @@ export default function Settings() {
       </section>
       <aside className="card h-fit p-6" aria-labelledby="plan-h">
         <h2 id="plan-h" className="text-lg font-bold">Plan and credits</h2>
-        {hasActivePlan(me) ? (
+        {subscriptionNeedsPayment(me) ? (
+          <PaymentIssueNotice className="mt-4" />
+        ) : hasActivePlan(me) ? (
           <dl className="mt-4 space-y-2 text-sm">
             <div className="flex justify-between"><dt className="text-muted">Plan</dt><dd>{plan?.name ?? me.subscription.planId}</dd></div>
             <div className="flex justify-between"><dt className="text-muted">Credits left</dt><dd>{me.credits.balance} / {me.credits.allowance}</dd></div>

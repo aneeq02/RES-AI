@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { Link, Navigate, useLocation, useSearchParams } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Check, Lock, LoaderCircle, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Lock, LoaderCircle, RotateCcw, ShieldCheck } from "lucide-react";
 import AgentAvatar from "../components/agents/AgentAvatar";
 import { plans, getPlan, formatPrice, PLAN_FEATURES, creditsLine } from "../data/plans";
 import { getMember } from "../data/members";
 import { useAuth } from "../context/AuthContext";
-import { hasActivePlan, useMe } from "../context/MeContext";
+import { useMe } from "../context/MeContext";
+import { hasActivePlan, subscriptionNeedsPayment } from "../lib/subscription";
+import PaymentIssueNotice from "../components/billing/PaymentIssueNotice";
 import { api } from "../lib/api";
 
 function PlanPicker({ value, onChange }) {
@@ -59,7 +61,7 @@ function Summary({ plan, agent }) {
           <AgentAvatar member={agent} className="h-16 w-14 shrink-0 rounded-xl" />
           <div className="text-sm">
             <p className="font-bold">Starting with {agent.name}</p>
-            <p className="text-subtle">{agent.role} · plus the full team</p>
+            <p className="text-subtle">{agent.role} · plus each specialist as they launch</p>
           </div>
         </div>
       )}
@@ -108,7 +110,8 @@ export default function Checkout() {
   const plan = getPlan(planId);
   const agent = getMember(state?.agent);
   const { session, loading } = useAuth();
-  const { me } = useMe();
+  const { me, error: meError, refresh } = useMe();
+  const [retrying, setRetrying] = useState(false);
   const [terms, setTerms] = useState(false);
   const [error, setError] = useState(null);
   const [status, setStatus] = useState("idle"); // idle | redirecting
@@ -127,8 +130,17 @@ export default function Checkout() {
       window.location.assign(url);
     } catch (err) {
       setStatus("idle");
-      setError(err.status === 409 ? "You already have an active plan." : "We couldn't start checkout. Please try again.");
+      if (err.status === 409) {
+        setError("You already have a subscription. Manage it from your workspace settings.");
+        refresh();
+      } else setError("We couldn't start checkout. Please try again.");
     }
+  };
+
+  const retryMe = async () => {
+    setRetrying(true);
+    await refresh();
+    setRetrying(false);
   };
 
   return (
@@ -139,7 +151,17 @@ export default function Checkout() {
       <h1 className="mt-4 text-4xl font-bold tracking-tight md:text-5xl">Complete your order</h1>
       {params.get("canceled") && <p role="status" className="mt-3 text-muted">Checkout was cancelled. You haven't been charged.</p>}
 
-      {hasActivePlan(me) ? (
+      {!me && meError ? (
+        <div className="card mt-10 max-w-xl p-8">
+          <p role="alert" className="font-bold">We couldn't load your account, so checkout can't start yet.</p>
+          <p className="mt-1 text-sm text-muted">Check your connection and try again.</p>
+          <button type="button" onClick={retryMe} disabled={retrying} className="btn-secondary mt-6">
+            {retrying ? <LoaderCircle size={18} className="animate-spin" aria-hidden="true" /> : <RotateCcw size={18} aria-hidden="true" />} Retry
+          </button>
+        </div>
+      ) : subscriptionNeedsPayment(me) ? (
+        <PaymentIssueNotice className="mt-10 max-w-xl" />
+      ) : hasActivePlan(me) ? (
         <div className="card mt-10 max-w-xl p-8">
           <p className="font-bold">You already have an active plan.</p>
           <Link to="/app" className="btn-primary mt-6">Go to your team <ArrowRight size={18} aria-hidden="true" /></Link>

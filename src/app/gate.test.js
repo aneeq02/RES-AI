@@ -25,7 +25,19 @@ describe("resolveGate", () => {
   it("lets onboarded users in", () => {
     expect(resolveGate({ authLoading: false, session: {}, me: me("2026-09-01"), path: "/app" })).toEqual({ state: "ok" });
   });
-  it("reports API errors", () => {
+  it("reports API errors when there's no profile to show", () => {
     expect(resolveGate({ authLoading: false, session: {}, meError: new Error("x"), path: "/app" })).toEqual({ state: "error" });
+  });
+  it("keeps the app up when a background refresh fails but the profile is already loaded", () => {
+    expect(resolveGate({ authLoading: false, session: {}, me: me("2026-09-01"), meError: new Error("x"), path: "/app" })).toEqual({ state: "ok" });
+  });
+  it("omits next for the /app home so onboarding picks its own default", () => {
+    expect(resolveGate({ authLoading: false, session: {}, me: me(null), path: "/app" })).toEqual({ state: "redirect", to: "/app/onboarding" });
+  });
+  it("keeps next for /app with a query string (e.g. returning from Stripe)", () => {
+    expect(resolveGate({ authLoading: false, session: {}, me: me(null), path: "/app?checkout=success" })).toEqual({
+      state: "redirect",
+      to: "/app/onboarding?next=%2Fapp%3Fcheckout%3Dsuccess",
+    });
   });
 });

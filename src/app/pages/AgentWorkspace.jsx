@@ -5,8 +5,11 @@ import AgentAvatar from "../../components/agents/AgentAvatar";
 import ThreadList from "../components/ThreadList";
 import ChatThread from "../components/ChatThread";
 import { getMember } from "../../data/members";
-import { hasActivePlan, useMe } from "../../context/MeContext";
+import { useMe } from "../../context/MeContext";
 import { api } from "../../lib/api";
+import { hasActivePlan, subscriptionNeedsPayment } from "../../lib/subscription";
+import PaymentIssueNotice from "../../components/billing/PaymentIssueNotice";
+import { pickThread } from "../pickThread";
 
 export default function AgentWorkspace() {
   const { id } = useParams();
@@ -15,7 +18,9 @@ export default function AgentWorkspace() {
   const live = me?.agents?.some((a) => a.id === id);
   const [params, setParams] = useSearchParams();
   const [threads, setThreads] = useState([]);
-  const activeId = params.get("thread") || threads[0]?.id;
+  const activeId = pickThread(params.get("thread"), threads);
+  const planActive = hasActivePlan(me);
+  const needsPayment = subscriptionNeedsPayment(me);
 
   const loadThreads = useCallback(async () => {
     const { threads: list } = await api(`/threads?agent=${id}`);
@@ -70,12 +75,13 @@ export default function AgentWorkspace() {
         <ThreadList threads={threads} activeId={activeId} onSelect={(tid) => setParams({ thread: tid })} onNew={newThread} />
       </aside>
       <section aria-label={`Chat with ${member.name}`}>
-        {!hasActivePlan(me) && (
+        {needsPayment && <PaymentIssueNotice className="mb-4" />}
+        {!planActive && !needsPayment && (
           <p className="mb-4 rounded-2xl border border-line bg-surface-2 px-4 py-3 text-sm text-muted">
             <Link to="/checkout" className="font-bold text-white underline">Choose a plan</Link> to chat with {member.name} and run tasks.
           </p>
         )}
-        {activeId && <ChatThread key={activeId} threadId={activeId} agent={member} canChat={hasActivePlan(me)} starter={member.prompt} onActivity={loadThreads} />}
+        {activeId && <ChatThread key={activeId} threadId={activeId} agent={member} canChat={planActive} lockedPlaceholder={needsPayment ? "Update your payment method to keep chatting" : undefined} starter={member.prompt} onActivity={loadThreads} />}
       </section>
     </div>
   );

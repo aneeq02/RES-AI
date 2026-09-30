@@ -2,7 +2,9 @@ import React from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Logo from "../../components/navbar/Logo";
 import ProfileForm, { toForm } from "../components/ProfileForm";
-import { hasActivePlan, useMe } from "../../context/MeContext";
+import { useMe } from "../../context/MeContext";
+import { hasActivePlan } from "../../lib/subscription";
+import { safeNext } from "../../lib/safeNext";
 import { api } from "../../lib/api";
 
 export default function Onboarding() {
@@ -14,8 +16,7 @@ export default function Onboarding() {
   const save = async (body) => {
     await api("/profile", { method: "PUT", body });
     const fresh = await refresh();
-    const safeNext = next && next.startsWith("/") && !next.startsWith("//") ? next : null;
-    navigate(safeNext || (hasActivePlan(fresh) ? "/app" : "/checkout"), { replace: true });
+    navigate(safeNext(next) || (hasActivePlan(fresh) ? "/app" : "/checkout"), { replace: true });
   };
 
   return (
