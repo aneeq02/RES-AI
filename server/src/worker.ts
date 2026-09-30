@@ -8,12 +8,16 @@ import type { TaskLlm } from "./runner/llm.js";
 
 export const MAX_ATTEMPTS = 3;
 
+// Errors that arrive mid-stream (as an SSE `error` event) carry no HTTP status, only the API error type.
+const RETRYABLE_TYPES = new Set(["overloaded_error", "api_error", "rate_limit_error"]);
+
 export function isRetryable(err: unknown): boolean {
   return (
     err instanceof Anthropic.RateLimitError ||
     err instanceof Anthropic.InternalServerError ||
     err instanceof Anthropic.APIConnectionError ||
-    (err instanceof Anthropic.APIError && typeof err.status === "number" && err.status >= 500)
+    (err instanceof Anthropic.APIError && typeof err.status === "number" && err.status >= 500) ||
+    (err instanceof Anthropic.APIError && err.type !== null && RETRYABLE_TYPES.has(err.type))
   );
 }
 

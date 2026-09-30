@@ -30,7 +30,7 @@ export async function loadBusiness(db: Db, userId: string): Promise<BusinessProf
   return r ? { company: r.company, website: r.website, industry: r.industry, audience: r.audience, competitors: r.competitors, brandVoice: r.brand_voice } : null;
 }
 
-export async function sweepStaleTasks(db: Db, olderThanMinutes: number, queuedOlderThanMinutes = 30): Promise<string[]> {
+export async function sweepStaleTasks(db: Db, olderThanMinutes: number, queuedOlderThanMinutes = 120): Promise<string[]> {
   const { rows: running } = await db.query<{ id: string }>(
     `select id from tasks where status = 'running' and started_at < now() - make_interval(mins => $1)`,
     [olderThanMinutes],
@@ -55,6 +55,10 @@ export function dbRunnerIO(db: Db): RunnerIO {
         [task.user_id, task.agent_id],
       );
       return { business, earlier: rows.map((r) => ({ title: r.title, excerpt: r.body_md.slice(0, 3000) })) };
+    },
+    async isStillRunning(task) {
+      const { rows } = await db.query<{ status: string }>("select status from tasks where id = $1", [task.id]);
+      return rows[0]?.status === "running";
     },
     async addEvent(task, type, text) {
       await db.query("insert into task_events (task_id, user_id, type, text) values ($1, $2, $3, $4)", [task.id, task.user_id, type, text.slice(0, 300)]);

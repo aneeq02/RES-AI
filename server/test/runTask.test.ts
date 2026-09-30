@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 import type Anthropic from "@anthropic-ai/sdk";
 import { buddy } from "../src/agents/buddy.js";
-import { runTask, TaskError, type DeliverableInput, type RunnerIO, type TaskRow } from "../src/runner/runTask.js";
+import { costUsd } from "../src/pricing.js";
+import { runTask, TaskError, WALL_CLOCK_BUDGET_MS, type DeliverableInput, type RunnerIO, type TaskRow } from "../src/runner/runTask.js";
 import type { TaskLlm, TaskTurn } from "../src/runner/llm.js";
 
 type Msg = Anthropic.Beta.BetaMessage;
@@ -32,6 +33,7 @@ function memoryIO() {
     loadContext: async () => ({ business: null, earlier: [] }),
     addEvent: async (_t, type, text) => { events.push([type, text]); },
     complete: async (_t, d, cost) => { saved.push({ d, cost }); return "deliv_1"; },
+    isStillRunning: async () => true,
   };
   return { io, events, saved };
 }
@@ -121,6 +123,7 @@ describe("runTask", () => {
         if (type === "search" || type === "fetch") throw new Error("db write failed");
       },
       complete: async (_t, d, cost) => { saved.push({ d, cost }); return "deliv_1"; },
+      isStillRunning: async () => true,
     };
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     try {
@@ -139,5 +142,81 @@ describe("runTask", () => {
     const meter = { usd: 0 };
     await expect(runTask(task, deps(llm, memoryIO().io), meter)).rejects.toBeInstanceOf(TaskError);
     expect(meter.usd).toBeGreaterThan(0);
+  });
+  it("wraps up with a partial report once the wall-clock budget has passed", async () => {
+    let clock = 1_000_000;
+    const { llm, turns } = scripted([
+      msg([toolUse("log_step", { text: "Searching pricing" })], "tool_use"),
+      msg([toolUse("save_deliverable", goodDeliverable)], "tool_use"),
+    ]);
+    const timed: TaskLlm = {
+      async run(turn, onBlock) {
+        const reply = await llm.run(turn, onBlock);
+        clock += WALL_CLOCK_BUDGET_MS + 1; // the first turn alone blows the time budget
+        return reply;
+      },
+    };
+    const { io, saved } = memoryIO();
+    await runTask(task, { ...deps(timed, io), now: () => clock });
+    expect(turns).toHaveLength(2);
+    expect(turns[0].tools.map((t: any) => t.name)).toContain("log_step");
+    expect(turns[1].tools.map((t: any) => t.name)).toEqual(["save_deliverable"]);
+    expect(JSON.stringify(turns[1].messages.at(-1))).toMatch(/research budget/i);
+    expect(saved[0].d.partial).toBe(true);
+  });
+
+  it("stops without calling the model again once the task is no longer running", async () => {
+    const { llm, turns } = scripted([
+      msg([toolUse("log_step", { text: "Searching pricing" })], "tool_use"),
+      msg([toolUse("save_deliverable", goodDeliverable)], "tool_use"),
+    ]);
+    const { io, saved } = memoryIO();
+    const checks: string[] = [];
+    io.isStillRunning = async (t) => { checks.push(t.id); return false; };
+    await expect(runTask(task, deps(llm, io))).rejects.toThrow(new TaskError("Buddy stopped because the task was cancelled."));
+    expect(turns).toHaveLength(1); // the first turn never checks; the second is never made
+    expect(checks).toEqual(["t1"]);
+    expect(saved).toHaveLength(0);
+  });
+
+  it("rejects non-http(s) source URLs with a tool error", async () => {
+    const bad = { ...goodDeliverable, sources: [{ title: "x", url: "javascript:alert(1)" }] };
+    const { llm, turns } = scripted([
+      msg([toolUse("save_deliverable", bad)], "tool_use"),
+      msg([toolUse("save_deliverable", goodDeliverable, "tu_2")], "tool_use"),
+    ]);
+    const { io, saved } = memoryIO();
+    await runTask(task, deps(llm, io));
+    const errorResult = (turns[1].messages.at(-1)!.content as any[])[0];
+    expect(errorResult).toMatchObject({ type: "tool_result", is_error: true });
+    expect(errorResult.content).toMatch(/sources\.0\.url/);
+    expect(saved).toHaveLength(1);
+    expect(saved[0].d.sources).toEqual(goodDeliverable.sources);
+  });
+
+  it("prices each turn by the model that served it", async () => {
+    const u = usage(1000);
+    const fallback = { ...msg([toolUse("save_deliverable", goodDeliverable)], "tool_use", u), model: "claude-sonnet-5" } as Msg;
+    const { llm } = scripted([fallback]);
+    const out = await runTask(task, deps(llm, memoryIO().io));
+    expect(out.costUsd).toBeCloseTo(costUsd("claude-sonnet-5", u), 10);
+    expect(out.costUsd).not.toBeCloseTo(costUsd("claude-opus-5", u), 10);
+  });
+
+  it("swallows a failing log_step event write", async () => {
+    const { llm } = scripted([
+      msg([toolUse("log_step", { text: "Searching pricing" })], "tool_use"),
+      msg([toolUse("save_deliverable", goodDeliverable)], "tool_use"),
+    ]);
+    const { io, saved } = memoryIO();
+    io.addEvent = async () => { throw new Error("db write failed"); };
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      await runTask(task, deps(llm, io));
+      expect(saved).toHaveLength(1);
+      expect(errorSpy).toHaveBeenCalledWith("task event write failed", expect.any(Error));
+    } finally {
+      errorSpy.mockRestore();
+    }
   });
 });

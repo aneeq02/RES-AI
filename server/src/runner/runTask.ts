@@ -25,6 +25,8 @@ export interface RunnerIO {
   loadContext(task: TaskRow): Promise<{ business: BusinessProfile | null; earlier: { title: string; excerpt: string }[] }>;
   addEvent(task: TaskRow, type: "step" | "search" | "fetch" | "note", text: string): Promise<void>;
   complete(task: TaskRow, d: DeliverableInput, costUsd: number): Promise<string>;
+  /** False once the task has left 'running' (e.g. the sweeper failed and refunded it). */
+  isStillRunning(task: TaskRow): Promise<boolean>;
 }
 
 /** A failure the user should see as-is; never retried. */
@@ -32,6 +34,8 @@ export class TaskError extends Error {}
 
 const TURN_MAX_TOKENS = 32000;
 const EXTRA_TURNS_AFTER_BUDGET = 3;
+/** Wall-clock budget, kept well under the queue's 15-minute job expiry so a long run wraps up with a partial report. */
+export const WALL_CLOCK_BUDGET_MS = 12 * 60_000;
 const WRAP_UP =
   "You have reached the research budget for this task. Do not search or fetch anything else. Call save_deliverable now with the best report you can write from what you have found, and set partial to true.";
 const NUDGE = "You have not saved the report yet. Call save_deliverable now with the complete report.";
@@ -40,7 +44,9 @@ const LogStep = z.object({ text: z.string().min(1).max(300) });
 const SaveDeliverable = z.object({
   title: z.string().min(1).max(200),
   body_md: z.string().min(1),
-  sources: z.array(z.object({ title: z.string().max(300), url: z.string().url() })).max(100),
+  sources: z
+    .array(z.object({ title: z.string().max(300), url: z.string().url().refine((u) => /^https?:\/\//i.test(u), "Source URLs must start with http:// or https://") }))
+    .max(100),
   partial: z.boolean().optional(),
 });
 
@@ -79,12 +85,14 @@ function webTools(remainingSearches: number, remainingFetches: number): Anthropi
 
 export async function runTask(
   task: TaskRow,
-  deps: { llm: TaskLlm; io: RunnerIO; agent: AgentConfig; model: string },
+  deps: { llm: TaskLlm; io: RunnerIO; agent: AgentConfig; model: string; now?: () => number },
   meter: { usd: number } = { usd: 0 },
 ): Promise<{ deliverableId: string; costUsd: number }> {
   const kind = deps.agent.taskKinds[task.kind];
   if (!kind) throw new TaskError(`Unknown task type "${task.kind}".`);
   const { budget } = kind;
+  const now = deps.now ?? Date.now;
+  const deadline = now() + WALL_CLOCK_BUDGET_MS;
 
   const ctx = await deps.io.loadContext(task);
   const system = deps.agent.taskSystemPrompt(ctx.business, task.kind);
@@ -108,7 +116,10 @@ export async function runTask(
   const save = async (d: DeliverableInput) => ({ deliverableId: await deps.io.complete(task, d, meter.usd), costUsd: meter.usd });
 
   while (true) {
-    if (!wrappingUp && (used.turns >= budget.maxTurns || used.outputTokens >= budget.maxOutputTokens)) {
+    if (used.turns > 0 && !(await deps.io.isStillRunning(task))) {
+      throw new TaskError("Buddy stopped because the task was cancelled.");
+    }
+    if (!wrappingUp && (used.turns >= budget.maxTurns || used.outputTokens >= budget.maxOutputTokens || now() >= deadline)) {
       wrappingUp = true;
       messages.push({ role: "user", content: WRAP_UP });
     }
@@ -130,7 +141,8 @@ export async function runTask(
     used.outputTokens += message.usage.output_tokens;
     used.searches += message.usage.server_tool_use?.web_search_requests ?? 0;
     used.fetches += message.usage.server_tool_use?.web_fetch_requests ?? 0;
-    meter.usd += costUsd(deps.model, message.usage);
+    // Price by the model that actually served the turn (a server-side fallback may differ).
+    meter.usd += costUsd(message.model || deps.model, message.usage);
 
     if (message.stop_reason === "refusal") throw new TaskError("Buddy declined this request. Try rephrasing the brief.");
 
@@ -161,7 +173,7 @@ export async function runTask(
       }
       if (tu.name === "log_step") {
         const parsed = LogStep.safeParse(tu.input);
-        if (parsed.success) await deps.io.addEvent(task, "step", parsed.data.text);
+        if (parsed.success) logEvent("step", parsed.data.text);
         results.push({ type: "tool_result", tool_use_id: tu.id, content: "ok" });
       } else if (tu.name === "save_deliverable") {
         const parsed = SaveDeliverable.safeParse(tu.input);

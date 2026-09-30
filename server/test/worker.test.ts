@@ -93,12 +93,40 @@ describe("processTaskJob", () => {
   });
 });
 
+describe("processTaskJob cancellation", () => {
+  it("stops calling the model once the task has been failed by someone else", async () => {
+    let calls = 0;
+    const llm: TaskLlm = {
+      run: async () => {
+        calls++;
+        await t.db.query("select public.fail_task($1, 'swept')", [taskId]);
+        return { content: [{ type: "tool_use", id: "tu", name: "log_step", input: { text: "Searching" } }], stop_reason: "tool_use", usage } as any;
+      },
+    };
+    expect(await processTaskJob(deps(llm), taskId)).toBe("failed");
+    expect(calls).toBe(1);
+    expect((await task()).error).toBe("swept");
+    expect(await creditBalance(t.db, userId)).toBe(10);
+  });
+});
+
 describe("isRetryable", () => {
   it("retries rate limits, server errors and connection errors only", () => {
     expect(isRetryable(new Anthropic.InternalServerError(500, undefined, "x", new Headers()))).toBe(true);
     expect(isRetryable(new Anthropic.APIConnectionError({ message: "reset" }))).toBe(true);
     expect(isRetryable(new Anthropic.BadRequestError(400, undefined, "x", new Headers()))).toBe(false);
     expect(isRetryable(new Error("x"))).toBe(false);
+  });
+
+  it("retries transient errors that arrive mid-stream (no HTTP status, only an error type)", () => {
+    // Mirrors how the SDK's SSE decoder builds an `event: error` payload.
+    const midStream = (type: "overloaded_error" | "api_error" | "rate_limit_error" | "invalid_request_error") =>
+      new Anthropic.APIError(undefined, { type: "error", error: { type, message: "x" } }, undefined, new Headers(), type);
+    expect(midStream("overloaded_error").status).toBeUndefined();
+    expect(isRetryable(midStream("overloaded_error"))).toBe(true);
+    expect(isRetryable(midStream("api_error"))).toBe(true);
+    expect(isRetryable(midStream("rate_limit_error"))).toBe(true);
+    expect(isRetryable(midStream("invalid_request_error"))).toBe(false);
   });
 });
 
@@ -115,9 +143,9 @@ describe("sweepStaleTasks", () => {
     expect(await sweepStaleTasks(t.db, 16)).toEqual([]);
   });
 
-  it("fails and refunds tasks stuck in queued", async () => {
-    await t.db.query("update tasks set queued_at = now() - interval '40 minutes' where id = $1", [taskId]);
-    expect(await sweepStaleTasks(t.db, 16, 30)).toEqual([taskId]);
+  it("fails and refunds tasks stuck in queued for over two hours by default", async () => {
+    await t.db.query("update tasks set queued_at = now() - interval '130 minutes' where id = $1", [taskId]);
+    expect(await sweepStaleTasks(t.db, 16)).toEqual([taskId]);
     const row = await task();
     expect(row.status).toBe("failed");
     expect(row.error).toBe("Buddy couldn't get started. Your credits were refunded.");
@@ -125,8 +153,19 @@ describe("sweepStaleTasks", () => {
   });
 
   it("leaves freshly queued tasks alone", async () => {
-    expect(await sweepStaleTasks(t.db, 16, 30)).toEqual([]);
+    expect(await sweepStaleTasks(t.db, 16)).toEqual([]);
     expect((await task()).status).toBe("queued");
+  });
+
+  it("leaves tasks queued behind ordinary load (under two hours) alone by default", async () => {
+    await t.db.query("update tasks set queued_at = now() - interval '45 minutes' where id = $1", [taskId]);
+    expect(await sweepStaleTasks(t.db, 16)).toEqual([]);
+    expect((await task()).status).toBe("queued");
+  });
+
+  it("honours an explicit queued threshold", async () => {
+    await t.db.query("update tasks set queued_at = now() - interval '40 minutes' where id = $1", [taskId]);
+    expect(await sweepStaleTasks(t.db, 16, 30)).toEqual([taskId]);
   });
 });
 
