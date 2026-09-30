@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { api } from "../../lib/api";
 import { supabase } from "../../lib/supabase";
 
@@ -8,11 +8,6 @@ const ACTIVE = new Set(["queued", "running"]);
 export default function useTaskLive(taskId, initialTask) {
   const [state, setState] = useState({ task: initialTask, events: [], deliverable: null });
   const active = ACTIVE.has(state.task?.status);
-  // realtime-js reuses a channel still in the list for the same topic, and removeChannel()
-  // is async (it stays "leaving" until the server acks) — so a plain `task-${taskId}` topic
-  // can collide across a StrictMode double effect, a quick unmount/remount, or two cards for
-  // the same task. Scope the topic per hook instance so each gets its own channel.
-  const instanceId = useId().replace(/:/g, "");
 
   const refresh = useCallback(async () => {
     const data = await api(`/tasks/${taskId}`);
@@ -31,15 +26,22 @@ export default function useTaskLive(taskId, initialTask) {
 
   useEffect(() => {
     if (!active || !supabase) return;
+    // realtime-js reuses a channel still in its list for the same topic, and removeChannel()
+    // is async (the channel stays "leaving" until the server acks). A topic stable across an
+    // effect's cleanup + re-run — including useId(), which doesn't change within a mount — can
+    // therefore collide with its own still-leaving predecessor under StrictMode's double-invoke,
+    // a quick unmount/remount, or two cards for the same task. Generate a fresh random suffix on
+    // every effect run so each subscribe always gets a brand-new topic.
+    const topic = `task-${taskId}-${Math.random().toString(36).slice(2, 10)}`;
     const channel = supabase
-      .channel(`task-${taskId}-${instanceId}`)
+      .channel(topic)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "task_events", filter: `task_id=eq.${taskId}` }, () => refresh())
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "tasks", filter: `id=eq.${taskId}` }, () => refresh())
       .subscribe();
     // Safety net if Realtime is unavailable: poll slowly.
     const poll = setInterval(() => refresh().catch(() => {}), 8000);
     return () => { clearInterval(poll); supabase.removeChannel(channel); };
-  }, [active, taskId, refresh, instanceId]);
+  }, [active, taskId, refresh]);
 
   return { ...state, refresh, setTask: (task) => setState((s) => ({ ...s, task })) };
 }

@@ -21,18 +21,19 @@ vi.mock("../../lib/supabase", () => ({
 }));
 
 /** Mounts a component calling the hook and returns an unmount function. */
-function mountHook(taskId, initialTask) {
+function mountHook(taskId, initialTask, { strict = false } = {}) {
   let container;
   function Harness() {
     useTaskLive(taskId, initialTask);
     return null;
   }
+  const tree = strict ? <React.StrictMode><Harness /></React.StrictMode> : <Harness />;
   act(() => {
     container = document.createElement("div");
     document.body.appendChild(container);
     const root = createRoot(container);
     container.__root = root;
-    root.render(<Harness />);
+    root.render(tree);
   });
   return () => {
     act(() => { container.__root.unmount(); });
@@ -68,5 +69,20 @@ describe("useTaskLive realtime channel topic", () => {
     unmountSecond();
 
     expect(secondTopic).not.toBe(firstTopic);
+  });
+
+  it("does not reuse the topic across StrictMode's own effect cleanup + re-run on one instance", () => {
+    const task = { id: "t3", status: "running" };
+    const unmount = mountHook("t3", task, { strict: true });
+
+    // React 19 StrictMode (dev) mounts, runs effects, cleans them up, and re-runs them once —
+    // all synchronously within this one mountHook() call, on what is logically a single
+    // component instance. A topic that doesn't vary per effect run (e.g. one derived from
+    // useId(), which is stable for the life of the instance) would be recorded twice here.
+    const t3Topics = channelNames.filter((n) => n.startsWith("task-t3-"));
+    expect(t3Topics.length).toBe(2);
+    expect(new Set(t3Topics).size).toBe(2);
+
+    unmount();
   });
 });
