@@ -9,6 +9,9 @@ const shim = fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.ur
 
 export async function makeTestDb() {
   const pg = new PGlite();
+  // PGlite otherwise defaults the session timezone to the host's local offset, so a bare
+  // date literal (e.g. '2026-09-01') cast to timestamptz lands at the wrong instant.
+  await pg.exec("set timezone = 'UTC'");
   await pg.exec(shim);
   const db: Db & { exec(sql: string): Promise<unknown> } = {
     query: (text, params) => pg.query(text, params as any[]) as any,
