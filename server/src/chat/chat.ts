@@ -55,6 +55,12 @@ export async function sendChatMessage(
   let lastSave = Date.now();
   const content = (): StoredBlock[] => (text ? [{ type: "text", text }] : []);
 
+  // Serialize every write to the assistant row through one promise chain, so a slow
+  // in-flight autosave can never resolve after (and overwrite) the final write.
+  let saving: Promise<void> = Promise.resolve();
+  const save = (c: StoredBlock[]): Promise<void> =>
+    (saving = saving.then(() => updateMessage(db, assistantId, c)).catch((err) => console.error("chat autosave failed", err)));
+
   try {
     const message = await deps.llm.stream(
       {
@@ -68,7 +74,7 @@ export async function sendChatMessage(
         void emit({ event: "text", data: { delta } });
         if (Date.now() - lastSave > SAVE_EVERY_MS) {
           lastSave = Date.now();
-          void updateMessage(db, assistantId, content()).catch((err) => console.error("chat autosave failed", err));
+          void save(content());
         }
       },
     );
@@ -98,11 +104,11 @@ export async function sendChatMessage(
       blocks.push({ type: "task", taskId });
       await emit({ event: "task_proposed", data: { taskId } });
     }
-    await updateMessage(db, assistantId, blocks);
+    await save(blocks);
     await emit({ event: "done", data: { messageId: assistantId } });
   } catch (err) {
     console.error("chat failed", err);
-    await updateMessage(db, assistantId, content());
+    await save(content());
     await emit({ event: "error", data: { message: "Buddy couldn't reply just now. Please try again." } });
   }
 }

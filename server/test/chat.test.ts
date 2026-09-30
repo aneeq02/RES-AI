@@ -1,9 +1,10 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type Anthropic from "@anthropic-ai/sdk";
 import { makeTestDb } from "./helpers/db.js";
 import { buddy } from "../src/agents/buddy.js";
 import { sendChatMessage, type ChatEvent } from "../src/chat/chat.js";
 import type { ChatLlm } from "../src/chat/llm.js";
+import type { Db } from "../src/db.js";
 
 let t: Awaited<ReturnType<typeof makeTestDb>>;
 let userId: string;
@@ -79,5 +80,36 @@ describe("sendChatMessage", () => {
     await run(llm, "second");
     expect(llm.calls[1].system).toContain("Acme");
     expect(llm.calls[1].messages.map((m: any) => m.role)).toEqual(["user", "assistant", "user"]);
+  });
+
+  it("does not let a slow in-flight autosave overwrite the final task block after the stream ends", async () => {
+    // Force every delta to cross the autosave interval, and delay every text-only
+    // autosave write (but not the final write, which includes the task block) so a
+    // write started mid-stream is still in flight when the stream resolves.
+    let clock = Date.now();
+    const nowSpy = vi.spyOn(Date, "now").mockImplementation(() => (clock += 2000));
+    const slowDb: Db = {
+      query: async (text: string, params?: unknown[]) => {
+        const isTextOnlyAutosave =
+          text.startsWith("update messages set content") && !String(params?.[1] ?? "").includes('"type":"task"');
+        if (isTextOnlyAutosave) await new Promise((resolve) => setTimeout(resolve, 50));
+        return t.db.query(text, params);
+      },
+    };
+
+    try {
+      const llm = fakeLlm(["I'll ", "compare ", "you to Asana."], [
+        { type: "tool_use", id: "tu1", name: "start_task", input: { kind: "competitor_analysis", summary: "Compare to Asana" } },
+      ]);
+      await sendChatMessage(
+        { db: slowDb, llm, model: "claude-sonnet-5" },
+        { userId, threadId, agent: buddy, text: "Compare us to Asana", emit: () => {} },
+      );
+      // Let any still in-flight delayed autosave land before asserting the final state.
+      await new Promise((resolve) => setTimeout(resolve, 150));
+      expect((await messages())[1].content).toContainEqual({ type: "task", taskId: expect.any(String) });
+    } finally {
+      nowSpy.mockRestore();
+    }
   });
 });
