@@ -1,8 +1,8 @@
-// Every plan unlocks the full team; longer commitments lower the monthly price.
+// Every plan includes each specialist as they launch; longer commitments lower the monthly price.
+// Only list what a subscriber gets today ("Brand voice training" is the business profile).
 export const PLAN_FEATURES = [
-  "All 12 AI specialists",
+  "The full AI team as each specialist launches (Buddy is live now)",
   "Brand voice training",
-  "Gmail, Slack, Notion & HubSpot integrations",
   "Priority email support",
 ];
 
@@ -24,7 +24,7 @@ export const plans = [
     price: 15.6,
     save: 70,
     popular: true,
-    extras: ["Dedicated onboarding call", "Custom agent personalities"],
+    extras: ["Dedicated onboarding call"],
     credits: 200,
   },
   {

@@ -34,7 +34,7 @@ export const FAQ_GROUPS = [
     items: [
       {
         q: "Which agents are included in my plan?",
-        a: "Every plan includes the full team of 12 specialists. Longer plans simply lower the monthly price and add onboarding extras.",
+        a: "Every plan includes each specialist as they launch. Buddy, our business strategist, is live now, and the rest of the team follows one at a time at no extra cost. Longer plans simply lower the monthly price and add onboarding extras.",
       },
       {
         q: "Can I cancel anytime?",

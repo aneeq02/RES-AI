@@ -108,7 +108,7 @@ const PAGE_SCHEMA = {
   ],
   "/pricing": () => [
     webPage("/pricing"),
-    service("/pricing", "res AI Employees subscription", "AI agents", "Subscription to the full team of 12 res AI employees.", { offers: offers() }),
+    service("/pricing", "res AI Employees subscription", "AI agents", "Subscription to the res AI team, with every specialist included as they launch.", { offers: offers() }),
   ],
   "/services": () => [webPage("/services", "CollectionPage")],
   "/crm": () => [webPage("/crm"), service("/crm", "AI-Powered CRM", "CRM implementation and automation", ROUTES["/crm"].description)],

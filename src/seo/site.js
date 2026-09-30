@@ -32,7 +32,7 @@ export const ROUTES = {
   "/pricing": {
     title: "Pricing: AI Employees From $15.60/Month | res",
     description:
-      "Simple pricing for the full team of 12 AI employees. Plans from $15.60/month with brand voice training, integrations and a 14-day money-back guarantee.",
+      "Simple pricing for your AI team: every specialist included as they launch. Plans from $15.60/month with brand voice training and a 14-day money-back guarantee.",
     breadcrumb: "Pricing",
     changefreq: "monthly",
     priority: 0.9,

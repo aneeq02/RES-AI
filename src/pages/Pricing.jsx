@@ -88,7 +88,7 @@ export default function Pricing() {
     <>
       <section className="container-page pb-20 pt-32 md:pt-40">
         <SectionHeading as="h1" eyebrow="Limited-time pricing" title={<>Choose <span className="text-brand-ink">res</span> at a price that fits you</>}>
-          One subscription, the whole AI team. Commit longer, pay less.
+          One subscription, every specialist as they launch. Commit longer, pay less.
         </SectionHeading>
 
         <motion.ul {...inViewStagger} className="mx-auto mt-20 grid max-w-6xl items-stretch gap-8 md:grid-cols-3">

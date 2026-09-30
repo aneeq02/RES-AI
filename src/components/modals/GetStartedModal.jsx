@@ -7,7 +7,7 @@ import Field from "../forms/Field";
 import useDialog from "../../hooks/useDialog";
 import { email as emailRule } from "../../utils/validation";
 
-const PERKS = ["All 12 specialists included", "Setup in under 5 minutes", "14-day money-back guarantee"];
+const PERKS = ["Buddy live now, more specialists on the way", "Setup in under 5 minutes", "14-day money-back guarantee"];
 
 export default function GetStartedModal({ isOpen, onClose }) {
   const ref = useDialog(isOpen, onClose);

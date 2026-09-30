@@ -148,3 +148,7 @@ export const members = [
 ];
 
 export const getMember = (id) => members.find((m) => m.id === id);
+
+// Agents you can use today. Keep in sync with server/src/agents/registry.ts (the app reads /me instead).
+export const LIVE_AGENT_IDS = ["buddy"];
+export const isLiveAgent = (id) => LIVE_AGENT_IDS.includes(id);

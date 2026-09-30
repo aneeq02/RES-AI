@@ -5,7 +5,7 @@ import { ArrowRight, Check, MessageSquare } from "lucide-react";
 import SectionHeading from "../components/ui/SectionHeading";
 import CTASection from "../components/ui/CTASection";
 import AgentAvatar from "../components/agents/AgentAvatar";
-import { members } from "../data/members";
+import { isLiveAgent, members } from "../data/members";
 import useHashScroll from "../hooks/useHashScroll";
 
 const FILTERS = [
@@ -16,6 +16,7 @@ const FILTERS = [
 ];
 
 function AgentCard({ m }) {
+  const live = isLiveAgent(m.id);
   return (
     <motion.article
       layout
@@ -33,7 +34,10 @@ function AgentCard({ m }) {
         imgClassName="pt-6 transition-transform duration-500 group-hover:scale-[1.04]"
       />
       <div className="flex flex-col p-6 md:p-8">
-        <h2 className="text-3xl font-bold tracking-tight">{m.name}</h2>
+        <div className="flex flex-wrap items-center gap-3">
+          <h2 className="text-3xl font-bold tracking-tight">{m.name}</h2>
+          {!live && <span className="rounded-full bg-white/5 px-2.5 py-1 text-xs font-bold text-subtle">Coming soon</span>}
+        </div>
         <p className="mt-1 text-sm font-bold uppercase tracking-[0.12em] text-brand-ink">{m.role}</p>
         <p className="mt-4 text-sm leading-relaxed text-zinc-300">{m.description}</p>
 
@@ -52,9 +56,13 @@ function AgentCard({ m }) {
 
         <div className="mt-auto flex items-center justify-between gap-4 pt-6">
           <p className="text-sm text-subtle">Included in every plan</p>
-          <Link to={`/app/agents/${m.id}`} className="btn-light min-h-11 px-6 py-2.5 text-xs group-hover:bg-brand group-hover:text-white">
-            Start with {m.name} <ArrowRight size={16} aria-hidden="true" />
-          </Link>
+          {live ? (
+            <Link to={`/app/agents/${m.id}`} className="btn-light min-h-11 px-6 py-2.5 text-xs group-hover:bg-brand group-hover:text-white">
+              Start with {m.name} <ArrowRight size={16} aria-hidden="true" />
+            </Link>
+          ) : (
+            <span className="inline-flex min-h-11 items-center rounded-full border border-line px-6 text-xs font-bold text-subtle">Coming soon</span>
+          )}
         </div>
       </div>
     </motion.article>
@@ -70,7 +78,7 @@ export default function Agents() {
     <>
       <section className="container-page pb-10 pt-32 md:pt-40">
         <SectionHeading as="h1" eyebrow="Your future team" title={<>Meet the <span className="text-brand-ink">specialists</span></>}>
-          Each specialist is built for one job: faster execution, consistent quality, zero downtime. Every plan includes the whole team.
+          Each specialist is built for one job: faster execution, consistent quality, zero downtime. Every plan includes each specialist as they launch, starting with Buddy.
         </SectionHeading>
 
         <div role="group" aria-label="Filter specialists" className="hide-scrollbar mt-12 flex gap-2 overflow-x-auto pb-2 md:justify-center">
@@ -105,7 +113,7 @@ export default function Agents() {
 
       <CTASection
         title="Want the whole team?"
-        body="Every plan unlocks all 12 specialists. Pick a plan and put them to work today."
+        body="Every plan includes each specialist as they launch. Start with Buddy today; the rest of the team joins your plan at no extra cost."
         primary={{ to: "/pricing", label: "Compare plans" }}
       />
     </>
