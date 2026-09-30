@@ -56,6 +56,15 @@ export async function upsertSubscription(db: Db, sub: Stripe.Subscription, now =
   const userId = sub.metadata?.userId;
   const planId = sub.metadata?.planId;
   if (!userId || !isPlanId(planId)) return;
+
+  // Stripe can deliver events out of order. If we already hold an active subscription for a
+  // *different* Stripe subscription id, and this incoming one is not itself active, treat it as
+  // a stale event for an older subscription (e.g. a late cancel after the user resubscribed) and
+  // skip the write rather than reverting the row.
+  const existing = await getSubscription(db, userId);
+  const incomingActive = ACTIVE.has(sub.status);
+  if (isActive(existing) && existing.stripe_subscription_id !== sub.id && !incomingActive) return;
+
   const customer = typeof sub.customer === "string" ? sub.customer : sub.customer.id;
   const periodEnd = sub.items?.data?.[0]?.current_period_end;
   await db.query(
@@ -111,7 +120,10 @@ export async function handleStripeEvent(db: Db, stripe: StripeLike, event: Strip
     const s = event.data.object as Stripe.Checkout.Session;
     if (s.subscription) sub = typeof s.subscription === "string" ? await stripe.subscriptions.retrieve(s.subscription) : s.subscription;
   } else if (event.type.startsWith("customer.subscription.")) {
-    sub = event.data.object as Stripe.Subscription;
+    // Don't trust the event payload's state — Stripe can deliver subscription events out of
+    // order. Re-fetch the subscription so ordering doesn't matter (Stripe's recommended pattern).
+    const obj = event.data.object as Stripe.Subscription;
+    sub = await stripe.subscriptions.retrieve(obj.id);
   }
 
   const ours = Boolean(sub?.metadata?.userId && isPlanId(sub.metadata.planId));

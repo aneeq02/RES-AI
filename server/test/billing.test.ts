@@ -23,6 +23,7 @@ const sub = (over: Partial<Record<string, unknown>> = {}) =>
 
 function fakeStripe() {
   const created: any[] = [];
+  let retrieveResult = sub();
   return {
     created,
     customers: { create: async (p: any) => { created.push(["customer", p]); return { id: "cus_1" }; } },
@@ -33,7 +34,11 @@ function fakeStripe() {
         retrieve: async () => ({ client_reference_id: userId, subscription: sub() }),
       },
     },
-    subscriptions: { retrieve: async () => sub() },
+    subscriptions: {
+      retrieve: async () => retrieveResult,
+      // Test-controlled: handleStripeEvent must re-fetch rather than trust the event payload.
+      setRetrieveResult(s: Stripe.Subscription) { retrieveResult = s; },
+    },
     billingPortal: { sessions: { create: async () => ({ url: "https://billing.stripe.test" }) } },
     webhooks: {} as any,
   } as any;
@@ -97,7 +102,26 @@ describe("billing", () => {
   });
 
   it("ignores subscriptions without our metadata", async () => {
+    const stripe = fakeStripe();
+    stripe.subscriptions.setRetrieveResult(sub({ metadata: {} }));
     const event = { id: "evt_2", type: "customer.subscription.updated", data: { object: sub({ metadata: {} }) } } as unknown as Stripe.Event;
-    expect(await handleStripeEvent(t.db, fakeStripe(), event)).toBe("ignored");
+    expect(await handleStripeEvent(t.db, stripe, event)).toBe("ignored");
+  });
+
+  it("re-fetches the subscription instead of trusting a stale event payload", async () => {
+    const stripe = fakeStripe();
+    // The event payload says canceled, but the live subscription (re-fetched) is still active.
+    stripe.subscriptions.setRetrieveResult(sub({ status: "active" }));
+    const event = { id: "evt_3", type: "customer.subscription.deleted", data: { object: sub({ status: "canceled" }) } } as unknown as Stripe.Event;
+    expect(await handleStripeEvent(t.db, stripe, event)).toBe("processed");
+    expect(await getSubscription(t.db, userId)).toMatchObject({ status: "active" });
+  });
+
+  it("keeps the newer subscription when a stale cancel for an older one arrives late", async () => {
+    await upsertSubscription(t.db, sub({ id: "sub_1", status: "canceled" }), new Date("2026-09-02T00:00:00Z"));
+    await upsertSubscription(t.db, sub({ id: "sub_2", status: "active" }), new Date("2026-09-05T00:00:00Z"));
+    await upsertSubscription(t.db, sub({ id: "sub_1", status: "canceled" }), new Date("2026-09-06T00:00:00Z"));
+    expect(await getSubscription(t.db, userId)).toMatchObject({ status: "active", stripe_subscription_id: "sub_2" });
+    expect(await creditBalance(t.db, userId)).toBe(200);
   });
 });
