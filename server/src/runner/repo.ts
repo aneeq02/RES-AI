@@ -14,7 +14,7 @@ export async function claimTask(db: Db, taskId: string): Promise<TaskRow | null>
 }
 
 export async function requeueTask(db: Db, taskId: string): Promise<void> {
-  await db.query("update tasks set status = 'queued' where id = $1 and status = 'running'", [taskId]);
+  await db.query("update tasks set status = 'queued', queued_at = now() where id = $1 and status = 'running'", [taskId]);
 }
 
 export async function setTaskCost(db: Db, taskId: string, usd: number): Promise<void> {
@@ -30,13 +30,20 @@ export async function loadBusiness(db: Db, userId: string): Promise<BusinessProf
   return r ? { company: r.company, website: r.website, industry: r.industry, audience: r.audience, competitors: r.competitors, brandVoice: r.brand_voice } : null;
 }
 
-export async function sweepStaleTasks(db: Db, olderThanMinutes: number): Promise<string[]> {
-  const { rows } = await db.query<{ id: string }>(
+export async function sweepStaleTasks(db: Db, olderThanMinutes: number, queuedOlderThanMinutes = 30): Promise<string[]> {
+  const { rows: running } = await db.query<{ id: string }>(
     `select id from tasks where status = 'running' and started_at < now() - make_interval(mins => $1)`,
     [olderThanMinutes],
   );
-  for (const { id } of rows) await failTask(db, id, "Buddy took too long and stopped. Your credits were refunded.");
-  return rows.map((r) => r.id);
+  for (const { id } of running) await failTask(db, id, "Buddy took too long and stopped. Your credits were refunded.");
+
+  const { rows: queued } = await db.query<{ id: string }>(
+    `select id from tasks where status = 'queued' and queued_at < now() - make_interval(mins => $1)`,
+    [queuedOlderThanMinutes],
+  );
+  for (const { id } of queued) await failTask(db, id, "Buddy couldn't get started. Your credits were refunded.");
+
+  return [...running.map((r) => r.id), ...queued.map((r) => r.id)];
 }
 
 export function dbRunnerIO(db: Db): RunnerIO {
@@ -60,7 +67,7 @@ export function dbRunnerIO(db: Db): RunnerIO {
            values ($1, $2, $3, $4, $5, $6::jsonb, $7) returning id
          ), t as (
            update tasks set status = 'done', finished_at = now(), cost_usd = cost_usd + $8
-           where id = $1 returning thread_id, user_id
+           where id = $1 and status = 'running' returning thread_id, user_id
          ), m as (
            insert into messages (thread_id, user_id, role, content)
            select t.thread_id, t.user_id, 'assistant', jsonb_build_array(jsonb_build_object('type', 'deliverable', 'deliverableId', d.id))

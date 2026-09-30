@@ -95,4 +95,24 @@ describe("sweepStaleTasks", () => {
     await t.db.query("update tasks set status = 'running', started_at = now() where id = $1", [taskId]);
     expect(await sweepStaleTasks(t.db, 16)).toEqual([]);
   });
+
+  it("fails and refunds tasks stuck in queued", async () => {
+    await t.db.query("update tasks set queued_at = now() - interval '40 minutes' where id = $1", [taskId]);
+    expect(await sweepStaleTasks(t.db, 16, 30)).toEqual([taskId]);
+    const row = await task();
+    expect(row.status).toBe("failed");
+    expect(row.error).toBe("Buddy couldn't get started. Your credits were refunded.");
+    expect(await creditBalance(t.db, userId)).toBe(10);
+  });
+
+  it("leaves freshly queued tasks alone", async () => {
+    expect(await sweepStaleTasks(t.db, 16, 30)).toEqual([]);
+    expect((await task()).status).toBe("queued");
+  });
+});
+
+describe("reserveTaskCredits", () => {
+  it("sets queued_at when it moves the task to queued", async () => {
+    expect((await task()).queued_at).not.toBeNull();
+  });
 });
