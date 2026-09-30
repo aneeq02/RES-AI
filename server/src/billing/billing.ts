@@ -52,10 +52,22 @@ export async function createCheckoutSession(db: Db, stripe: StripeLike, p: { use
   return session.url;
 }
 
+/**
+ * The plan the subscription is on now. Plan changes made in the Customer Portal swap the item's
+ * price but leave the checkout-time metadata alone, so the price's lookup key wins.
+ */
+export function planIdOf(sub: Stripe.Subscription): PlanId | null {
+  const key = sub.items?.data?.[0]?.price?.lookup_key;
+  const fromPrice = key?.startsWith("res_") ? key.slice("res_".length) : null;
+  if (isPlanId(fromPrice) && lookupKey(fromPrice) === key) return fromPrice;
+  const fromMetadata = sub.metadata?.planId;
+  return isPlanId(fromMetadata) ? fromMetadata : null;
+}
+
 export async function upsertSubscription(db: Db, sub: Stripe.Subscription, now = new Date()): Promise<void> {
   const userId = sub.metadata?.userId;
-  const planId = sub.metadata?.planId;
-  if (!userId || !isPlanId(planId)) return;
+  const planId = planIdOf(sub);
+  if (!userId || !planId) return;
 
   // Stripe can deliver events out of order. If we already hold an active subscription for a
   // *different* Stripe subscription id, and this incoming one is not itself active, treat it as
@@ -126,7 +138,7 @@ export async function handleStripeEvent(db: Db, stripe: StripeLike, event: Strip
     sub = await stripe.subscriptions.retrieve(obj.id);
   }
 
-  const ours = Boolean(sub?.metadata?.userId && isPlanId(sub.metadata.planId));
+  const ours = Boolean(sub?.metadata?.userId && planIdOf(sub));
   if (sub && ours) await upsertSubscription(db, sub);
   await db.query("insert into stripe_events (event_id) values ($1) on conflict do nothing", [event.id]);
   return ours ? "processed" : "ignored";

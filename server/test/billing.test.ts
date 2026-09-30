@@ -17,7 +17,7 @@ const sub = (over: Partial<Record<string, unknown>> = {}) =>
     status: "active",
     start_date: START,
     metadata: { userId, planId: "12-month" },
-    items: { data: [{ current_period_end: START + 365 * 86400 }] },
+    items: { data: [{ current_period_end: START + 365 * 86400, price: { id: "price_12", lookup_key: "res_12-month" } }] },
     ...over,
   }) as unknown as Stripe.Subscription;
 
@@ -123,5 +123,24 @@ describe("billing", () => {
     await upsertSubscription(t.db, sub({ id: "sub_1", status: "canceled" }), new Date("2026-09-06T00:00:00Z"));
     expect(await getSubscription(t.db, userId)).toMatchObject({ status: "active", stripe_subscription_id: "sub_2" });
     expect(await creditBalance(t.db, userId)).toBe(200);
+  });
+  it("takes the plan from the item's price lookup key, so portal plan changes are picked up", async () => {
+    // Checkout metadata still says 1-month, but the customer switched to the 12-month price in the portal.
+    const switched = sub({
+      metadata: { userId, planId: "1-month" },
+      items: { data: [{ current_period_end: START + 365 * 86400, price: { id: "price_12", lookup_key: "res_12-month" } }] },
+    });
+    await upsertSubscription(t.db, switched, new Date("2026-09-02T00:00:00Z"));
+    expect(await getSubscription(t.db, userId)).toMatchObject({ plan_id: "12-month" });
+    expect(await creditBalance(t.db, userId)).toBe(200);
+  });
+
+  it("falls back to the metadata plan when the price has no recognised lookup key", async () => {
+    const legacy = sub({
+      metadata: { userId, planId: "3-month" },
+      items: { data: [{ current_period_end: START + 90 * 86400, price: { id: "price_x", lookup_key: null } }] },
+    });
+    await upsertSubscription(t.db, legacy, new Date("2026-09-02T00:00:00Z"));
+    expect(await getSubscription(t.db, userId)).toMatchObject({ plan_id: "3-month" });
   });
 });
