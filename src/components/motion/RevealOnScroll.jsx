@@ -1,28 +1,16 @@
-import React, { useEffect, useRef } from "react";
-import { motion, useInView, useAnimation } from "framer-motion";
+import React from "react";
+import { motion } from "framer-motion";
+import { fadeUp } from "../../animations/variants";
 
-export default function RevealOnScroll({ children, delay = 0 }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-10% 0px" });
-  const controls = useAnimation();
-
-  useEffect(() => {
-    if (isInView) controls.start("visible");
-  }, [isInView, controls]);
-
+export default function RevealOnScroll({ children, delay = 0, className }) {
   return (
     <motion.div
-      ref={ref}
-      variants={{
-        hidden: { opacity: 0, y: 50 },
-        visible: {
-          opacity: 1,
-          y: 0,
-          transition: { duration: 0.6, delay, ease: "easeOut" },
-        },
-      }}
+      className={className}
+      variants={fadeUp}
       initial="hidden"
-      animate={controls}
+      whileInView="visible"
+      viewport={{ once: true, margin: "-10% 0px" }}
+      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </motion.div>

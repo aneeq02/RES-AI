@@ -1,57 +1,75 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import PageWrapper from "../components/motion/PageWrapper";
-import RevealOnScroll from "../components/motion/RevealOnScroll";
-import { containerStagger, itemStagger } from "../animations/variants";
+import { ArrowRight, Bot, Globe, Users } from "lucide-react";
+import SectionHeading from "../components/ui/SectionHeading";
+import CTASection from "../components/ui/CTASection";
+import { inViewStagger, itemStagger } from "../animations/variants";
+
+const SERVICES = [
+  {
+    to: "/agents",
+    icon: Bot,
+    title: "AI Agents",
+    body: "Meet our team of 12 AI employees — social, support, sales, SEO, data and more — ready to work for you 24/7.",
+    points: ["12 specialists", "Brand-voice trained", "From $15.60/mo"],
+    featured: true,
+  },
+  {
+    to: "/crm",
+    icon: Users,
+    title: "CRM",
+    body: "Connect your entire sales pipeline with automated follow-ups, lead scoring, and clear reporting.",
+    points: ["Automated outreach", "Lead scoring", "Pipeline analytics"],
+  },
+  {
+    to: "/website-management",
+    icon: Globe,
+    title: "Website Management",
+    body: "Full-stack development and maintenance so your digital storefront is fast, secure, and always up to date.",
+    points: ["24/7 monitoring", "Speed & SEO", "Custom features"],
+  },
+];
 
 export default function Services() {
   return (
-    <PageWrapper>
-      <div className="pt-32 pb-20 px-6 md:px-8 max-w-7xl mx-auto min-h-screen bg-black text-white">
-        <RevealOnScroll>
-          <div className="text-center mb-16 md:mb-24">
-            <h1 className="text-5xl md:text-7xl font-black mb-4 italic tracking-tighter">Our Services</h1>
-            <p className="text-zinc-100 text-lg max-w-2xl mx-auto">
-              Comprehensive solutions to automate your workflow.
-            </p>
-          </div>
-        </RevealOnScroll>
+    <>
+      <section className="container-page pb-10 pt-32 md:pt-40">
+        <SectionHeading as="h1" eyebrow="What we do" title="Our services">
+          Everything you need to automate your workflow — from AI employees to the systems they run on.
+        </SectionHeading>
 
-        <motion.div variants={containerStagger} initial="hidden" animate="show" className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-          <Link to="/crm">
-            <motion.div variants={itemStagger} className="glass-panel p-8 md:p-12 rounded-[2.5rem] border border-white/10 bg-zinc-900/50 hover:border-red-500/50 transition duration-500 h-full group">
-              <div className="flex justify-between items-start">
-                <h3 className="text-2xl md:text-3xl font-bold mb-4 group-hover:text-red-500 transition">CRM</h3>
-                <span className="text-2xl transform group-hover:translate-x-2 transition">→</span>
-              </div>
-              <p className="text-zinc-100 mb-6">Connect your entire sales pipeline with automated follow-ups.</p>
-            </motion.div>
-          </Link>
+        <motion.ul {...inViewStagger} className="mt-16 grid gap-6 lg:grid-cols-3">
+          {SERVICES.map(({ to, icon: Icon, title, body, points, featured }) => (
+            <motion.li key={to} variants={itemStagger}>
+              <Link
+                to={to}
+                className={`group flex h-full flex-col rounded-[2rem] border p-8 transition duration-300 md:p-10 ${
+                  featured ? "border-brand/50 bg-gradient-to-b from-brand/15 to-surface-2" : "border-line bg-surface-2/70 hover:border-brand/40 hover:bg-surface-3"
+                }`}
+              >
+                <div className="flex items-start justify-between">
+                  <div className={`grid h-14 w-14 place-items-center rounded-2xl ${featured ? "bg-brand text-white" : "border border-line bg-white/5 text-brand-ink"}`}>
+                    <Icon size={26} aria-hidden="true" />
+                  </div>
+                  <ArrowRight size={24} className="text-subtle transition group-hover:translate-x-1 group-hover:text-white" aria-hidden="true" />
+                </div>
+                <h2 className="mt-8 text-3xl font-bold tracking-tight">{title}</h2>
+                <p className="mt-3 leading-relaxed text-muted">{body}</p>
+                <ul className="mt-auto flex flex-wrap gap-2 pt-8">
+                  {points.map((p) => (
+                    <li key={p} className="rounded-full border border-line bg-black/30 px-3 py-1.5 text-xs font-medium text-zinc-300">
+                      {p}
+                    </li>
+                  ))}
+                </ul>
+              </Link>
+            </motion.li>
+          ))}
+        </motion.ul>
+      </section>
 
-          <Link to="/website-management">
-            <motion.div variants={itemStagger} className="glass-panel p-8 md:p-12 rounded-[2.5rem] border border-white/10 bg-zinc-900/50 hover:border-red-500/50 transition duration-500 h-full group">
-              <div className="flex justify-between items-start">
-                <h3 className="text-2xl md:text-3xl font-bold mb-4 group-hover:text-red-500 transition">
-                  Website Management
-                </h3>
-                <span className="text-2xl transform group-hover:translate-x-2 transition">→</span>
-              </div>
-              <p className="text-zinc-100 mb-6">Full stack development and maintenance for your digital presence.</p>
-            </motion.div>
-          </Link>
-
-          <Link to="/agents">
-            <motion.div variants={itemStagger} className="glass-panel p-8 md:p-12 rounded-[2.5rem] border border-white/10 bg-zinc-900/50 hover:border-red-500/50 transition duration-500 h-full group">
-              <div className="flex justify-between items-start">
-                <h3 className="text-2xl md:text-3xl font-bold mb-4 group-hover:text-red-500 transition">AI Agents</h3>
-                <span className="text-2xl transform group-hover:translate-x-2 transition">→</span>
-              </div>
-              <p className="text-zinc-100">Meet our specialized team of AI employees ready to work for you.</p>
-            </motion.div>
-          </Link>
-        </motion.div>
-      </div>
-    </PageWrapper>
+      <CTASection title="Not sure where to start?" body="Tell us what's slowing your team down and we'll recommend the right mix." primary={{ to: "/contact", label: "Get a recommendation" }} secondary={{ to: "/pricing", label: "See pricing" }} />
+    </>
   );
 }

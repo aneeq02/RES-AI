@@ -1,68 +1,115 @@
-import React from "react";
-import { motion } from "framer-motion";
-import PageWrapper from "../components/motion/PageWrapper";
-import { containerStagger, itemStagger } from "../animations/variants";
+import React, { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowRight, Check, MessageSquare } from "lucide-react";
+import SectionHeading from "../components/ui/SectionHeading";
+import CTASection from "../components/ui/CTASection";
+import AgentAvatar from "../components/agents/AgentAvatar";
 import { members } from "../data/members";
+import useHashScroll from "../hooks/useHashScroll";
+
+const FILTERS = [
+  { id: "all", label: "All", match: () => true },
+  { id: "growth", label: "Marketing & Growth", match: (m) => ["soshie", "emmie", "penn", "seomi", "commet"].includes(m.id) },
+  { id: "sales", label: "Sales & Support", match: (m) => ["cassie", "milli", "scouty"].includes(m.id) },
+  { id: "ops", label: "Strategy & Ops", match: (m) => ["dexter", "buddy", "vizzy", "gigi"].includes(m.id) },
+];
+
+function AgentCard({ m }) {
+  return (
+    <motion.article
+      layout
+      id={m.id}
+      tabIndex={-1}
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.97, transition: { duration: 0.15 } }}
+      transition={{ duration: 0.35 }}
+      className="group grid scroll-mt-28 overflow-hidden rounded-[2rem] border border-line bg-surface-2/70 outline-none transition-colors duration-300 hover:border-brand/40 focus-visible:border-brand-ink sm:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]"
+    >
+      <AgentAvatar
+        member={m}
+        className="aspect-[4/3] sm:aspect-auto sm:min-h-[340px]"
+        imgClassName="pt-6 transition-transform duration-500 group-hover:scale-[1.04]"
+      />
+      <div className="flex flex-col p-6 md:p-8">
+        <h2 className="text-3xl font-bold tracking-tight">{m.name}</h2>
+        <p className="mt-1 text-sm font-bold uppercase tracking-[0.12em] text-brand-ink">{m.role}</p>
+        <p className="mt-4 text-sm leading-relaxed text-zinc-300">{m.description}</p>
+
+        <ul className="mt-5 space-y-2">
+          {m.skills.map((s) => (
+            <li key={s} className="flex items-center gap-2 text-sm text-zinc-200">
+              <Check size={16} className="shrink-0 text-brand-ink" aria-hidden="true" /> {s}
+            </li>
+          ))}
+        </ul>
+
+        <p className="mt-5 flex items-start gap-2 rounded-2xl border border-line bg-black/40 px-4 py-3 text-sm italic text-muted">
+          <MessageSquare size={16} className="mt-0.5 shrink-0 not-italic" aria-hidden="true" />
+          "{m.prompt}"
+        </p>
+
+        <div className="mt-auto flex items-center justify-between gap-4 pt-6">
+          <p className="text-sm text-subtle">
+            from <span className="font-display text-2xl font-bold text-white">${m.price}</span>/mo
+          </p>
+          <Link to="/checkout" state={{ agent: m.id }} className="btn-light min-h-11 px-6 py-2.5 text-xs group-hover:bg-brand group-hover:text-white">
+            Hire {m.name} <ArrowRight size={16} aria-hidden="true" />
+          </Link>
+        </div>
+      </div>
+    </motion.article>
+  );
+}
 
 export default function Agents() {
+  useHashScroll();
+  const [filter, setFilter] = useState("all");
+  const visible = useMemo(() => members.filter(FILTERS.find((f) => f.id === filter).match), [filter]);
+
   return (
-    <PageWrapper>
-      <div className="pt-32 pb-20 px-6 md:px-8 max-w-7xl mx-auto min-h-screen bg-black text-white relative">
-        <div className="text-center mb-16 md:mb-24">
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="inline-block py-1 px-3 rounded-full bg-red-600/10 border border-red-600/20 text-[10px] font-bold uppercase tracking-widest mb-6 text-red-500"
-          >
-            Your Future Team
-          </motion.span>
+    <>
+      <section className="container-page pb-10 pt-32 md:pt-40">
+        <SectionHeading as="h1" eyebrow="Your future team" title={<>Meet the <span className="text-brand-ink">specialists</span></>}>
+          Each specialist is built for one job: faster execution, consistent quality, zero downtime. Every plan includes the whole team.
+        </SectionHeading>
 
-          <motion.h1
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="text-5xl md:text-7xl font-black mb-6 italic tracking-tighter"
-          >
-            Meet the <span className="text-red-600">Specialists</span>
-          </motion.h1>
-
-          <p className="text-zinc-400 max-w-2xl mx-auto">
-            Pick a specialist built for one job: faster execution, consistent quality, zero downtime.
-          </p>
-        </div>
-
-        <motion.div variants={containerStagger} initial="hidden" animate="show" className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {members.map((m) => (
-            <motion.div
-              key={m.id}
-              variants={itemStagger}
-              className="group glass-panel p-6 md:p-8 rounded-[2.5rem] border border-white/10 bg-zinc-900/40 hover:bg-zinc-900 hover:border-red-500/30 transition-all duration-500 flex flex-col sm:flex-row gap-6 md:gap-8 items-center"
+        <div role="group" aria-label="Filter specialists" className="hide-scrollbar mt-12 flex gap-2 overflow-x-auto pb-2 md:justify-center">
+          {FILTERS.map((f) => (
+            <button
+              key={f.id}
+              type="button"
+              onClick={() => setFilter(f.id)}
+              aria-pressed={filter === f.id}
+              className={`min-h-11 shrink-0 rounded-full border px-5 text-sm font-bold transition ${
+                filter === f.id ? "border-brand bg-brand text-white" : "border-line bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-white"
+              }`}
             >
-              <div className="w-full sm:w-1/3 aspect-[3/4] rounded-[2rem] overflow-hidden relative shadow-2xl bg-zinc-800/50 flex items-center justify-center">
-                <div className={`absolute inset-0 bg-gradient-to-br ${m.color} opacity-20`} />
-                <div className="relative z-10 text-4xl font-black italic opacity-80 select-none">
-                  {m.name?.[0]}
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              </div>
-
-              <div className="flex-1 text-center sm:text-left">
-                <h2 className="text-3xl font-black italic tracking-tighter mb-1">{m.name}</h2>
-                <p className="text-red-500 font-bold uppercase text-xs tracking-widest mb-3">{m.role}</p>
-                <div className="inline-flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full text-[10px] text-zinc-400 border border-white/10 mb-4">
-                  <span className="text-zinc-500">from</span>
-                  <span className="text-white font-bold">${m.price}</span>
-                  <span className="text-zinc-500">/mo</span>
-                </div>
-                <p className="text-zinc-400 text-sm leading-relaxed mb-6">{m.description}</p>
-
-                <button className="w-full bg-white text-black py-3 rounded-full font-bold uppercase text-xs tracking-widest hover:bg-red-600 hover:text-white transition shadow-lg transform active:scale-95">
-                  Hire {m.name}
-                </button>
-              </div>
-            </motion.div>
+              {f.label}
+            </button>
           ))}
+        </div>
+      </section>
+
+      <section className="container-page pb-8">
+        <p className="sr-only" aria-live="polite">
+          Showing {visible.length} specialists
+        </p>
+        <motion.div layout className="grid gap-6 lg:grid-cols-2">
+          <AnimatePresence mode="popLayout">
+            {visible.map((m) => (
+              <AgentCard key={m.id} m={m} />
+            ))}
+          </AnimatePresence>
         </motion.div>
-      </div>
-    </PageWrapper>
+      </section>
+
+      <CTASection
+        title="Want the whole team?"
+        body="Every plan unlocks all 12 specialists. Pick a plan and put them to work today."
+        primary={{ to: "/pricing", label: "Compare plans" }}
+      />
+    </>
   );
 }

@@ -1,39 +1,34 @@
 import React from "react";
-import { motion } from "framer-motion";
-import PageWrapper from "../components/motion/PageWrapper";
-import { containerStagger, itemStagger } from "../animations/variants";
-import { FAQS } from "../data/faqs";
+import SectionHeading from "../components/ui/SectionHeading";
+import FaqList from "../components/ui/FaqList";
+import CTASection from "../components/ui/CTASection";
+import RevealOnScroll from "../components/motion/RevealOnScroll";
+import { FAQ_GROUPS } from "../data/faqs";
 
 export default function FAQ() {
   return (
-    <PageWrapper>
-      <div className="pt-32 pb-20 px-6 md:px-8 max-w-3xl mx-auto min-h-screen text-white bg-black">
-        <h1 className="text-5xl md:text-6xl font-black mb-16 italic tracking-tighter text-center">
-          Questions?
-        </h1>
+    <>
+      <section className="container-page max-w-3xl pb-8 pt-32 md:pt-40">
+        <SectionHeading as="h1" eyebrow="Help center" title="Questions?">
+          Quick answers about how res agents work, how your data is handled, and how billing works.
+        </SectionHeading>
 
-        <motion.div
-          variants={containerStagger}
-          initial="hidden"
-          animate="show"
-          className="space-y-6"
-        >
-          {FAQS.map((item, i) => (
-            <motion.div
-              key={i}
-              variants={itemStagger}
-              className="group bg-zinc-900/50 border border-white/5 rounded-[2rem] p-6 md:p-8 hover:border-red-600/30 transition duration-300"
-            >
-              <h3 className="text-lg md:text-xl font-bold mb-3 group-hover:text-red-500 transition">
-                {item.q}
-              </h3>
-              <p className="text-zinc-100 text-sm md:text-base leading-relaxed">
-                {item.a}
-              </p>
-            </motion.div>
+        <div className="mt-16 space-y-14">
+          {FAQ_GROUPS.map((g, i) => (
+            <RevealOnScroll key={g.title}>
+              <h2 className="mb-5 font-sans text-xs font-bold uppercase tracking-[0.16em] text-subtle">{g.title}</h2>
+              <FaqList items={g.items} defaultOpen={i === 0 ? 0 : -1} />
+            </RevealOnScroll>
           ))}
-        </motion.div>
-      </div>
-    </PageWrapper>
+        </div>
+      </section>
+
+      <CTASection
+        title="Didn't find your answer?"
+        body="Our team replies within one business day — usually much faster."
+        primary={{ to: "/contact", label: "Contact us" }}
+        secondary={{ to: "/pricing", label: "See pricing" }}
+      />
+    </>
   );
 }

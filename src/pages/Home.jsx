@@ -1,416 +1,303 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import {
+  ArrowRight,
+  CalendarDays,
+  Clock,
+  Database,
+  FileText,
+  Hash,
+  Mail,
+  MessageSquare,
+  Plug,
+  ShieldCheck,
+  Sparkles,
+  Table,
+  Users,
+  Webhook,
+  Workflow,
+  Zap,
+} from "lucide-react";
 
-import PageWrapper from "../components/motion/PageWrapper";
 import RevealOnScroll from "../components/motion/RevealOnScroll";
-import { backgroundGradient, containerStagger, itemStagger } from "../animations/variants";
-
-// ✅ NEW: Carousel
+import SectionHeading from "../components/ui/SectionHeading";
+import CTASection from "../components/ui/CTASection";
+import AutoVideo from "../components/ui/AutoVideo";
 import AgentsCarousel from "../components/home/AgentsCarousel";
+import ChatDemo from "../components/home/ChatDemo";
+import { inViewStagger, itemStagger } from "../animations/variants";
 
-const USE_CASES = [
-  {
-    title: "Soshie, plan my next 14 days of content",
-    desc: "Generate ideas, write captions, and ship a full calendar that matches your tone.",
-    icon: "✦",
-  },
-  {
-    title: "Cassie, reply to today’s comments",
-    desc: "Turn messy inbox threads into clean, brand-safe replies in seconds.",
-    icon: "☰",
-  },
-  {
-    title: "Dexter, summarize my KPIs and tell me what changed",
-    desc: "Spot trends, surface anomalies, and turn data into a clear action list.",
-    icon: "∿",
-  },
-  {
-    title: "Vizzy, build my schedule for tomorrow",
-    desc: "Organize your day, draft follow-ups, and keep everything moving.",
-    icon: "✓",
-  },
+const STATS = [
+  { value: "24/7", label: "Always on" },
+  { value: "12", label: "Specialists" },
+  { value: "<5 min", label: "Setup time" },
+  { value: "14-day", label: "Money-back" },
+];
+
+const STEPS = [
+  { icon: Users, title: "Create a workspace", body: "Set your business profile: goals, tone, offers, and your main audience." },
+  { icon: Plug, title: "Connect your tools", body: "Bring in the apps you already use so tasks flow without copy and paste." },
+  { icon: Workflow, title: "Assign repeatable work", body: "Turn recurring tasks into simple prompts and let your helpers run." },
 ];
 
 const INTEGRATIONS = [
-  { name: "Gmail", note: "Email & threads" },
-  { name: "Google Calendar", note: "Schedules" },
-  { name: "Slack", note: "Team updates" },
-  { name: "Notion", note: "Docs & SOPs" },
-  { name: "HubSpot", note: "Leads & CRM" },
-  { name: "Sheets", note: "Reporting" },
-  { name: "Zapier", note: "Automation" },
-  { name: "Webhook", note: "Custom flows" },
+  { name: "Gmail", note: "Email & threads", icon: Mail },
+  { name: "Google Calendar", note: "Schedules", icon: CalendarDays },
+  { name: "Slack", note: "Team updates", icon: Hash },
+  { name: "Notion", note: "Docs & SOPs", icon: FileText },
+  { name: "HubSpot", note: "Leads & CRM", icon: Database },
+  { name: "Sheets", note: "Reporting", icon: Table },
+  { name: "Zapier", note: "Automation", icon: Zap },
+  { name: "Webhooks", note: "Custom flows", icon: Webhook },
 ];
 
 const TESTIMONIALS = [
   {
-    quote:
-      "The biggest win is speed. I used to batch work on weekends—now tasks ship daily without feeling heavy.",
+    quote: "The biggest win is speed. I used to batch work on weekends — now tasks ship daily without feeling heavy.",
     name: "Founder, eCom brand",
-    meta: "Karachi • 3 weeks in",
+    meta: "Karachi · 3 weeks in",
   },
   {
-    quote:
-      "Support replies are consistent and calm. Our response time dropped and we stopped missing messages.",
+    quote: "Support replies are consistent and calm. Our response time dropped and we stopped missing messages.",
     name: "Ops Lead",
-    meta: "Dubai • Team of 6",
+    meta: "Dubai · Team of 6",
   },
   {
-    quote:
-      "We finally have clarity. Weekly metrics are readable, and priorities don’t get lost anymore.",
+    quote: "We finally have clarity. Weekly metrics are readable, and priorities don't get lost anymore.",
     name: "Growth Manager",
-    meta: "London • B2B SaaS",
+    meta: "London · B2B SaaS",
   },
 ];
 
+const BENEFITS = [
+  { icon: Clock, title: "Never off the clock", body: "Nights, weekends, holidays — work keeps moving." },
+  { icon: ShieldCheck, title: "Human in the loop", body: "Approve anything before it goes out." },
+  { icon: Sparkles, title: "Sounds like you", body: "Trained on your brand voice and examples." },
+];
+
+function Hero() {
+  return (
+    <section className="relative isolate overflow-hidden pt-28 md:pt-32">
+      <div
+        className="pointer-events-none absolute -right-40 -top-40 -z-10 h-[700px] w-[700px] rounded-full bg-gradient-to-br from-brand/30 to-purple-700/20 blur-[140px]"
+        aria-hidden="true"
+      />
+      <div className="container-page grid items-center gap-12 pb-16 lg:grid-cols-[1.1fr_1fr] lg:gap-16 lg:pb-24">
+        {/* No entrance fade: the headline is the LCP element and must paint immediately from the prerendered HTML */}
+        <div>
+          <span className="eyebrow mb-6">
+            <span className="h-2 w-2 rounded-full bg-brand-ink" aria-hidden="true" /> Always-on AI teammates
+          </span>
+          <h1 className="text-[clamp(2.75rem,7vw,5.5rem)] font-bold leading-[0.95] tracking-tight">
+            AI employees that <span className="text-brand-ink">never sleep.</span>
+          </h1>
+          <p className="mt-6 max-w-lg text-lg leading-relaxed text-zinc-300 md:text-xl">
+            Build, grow, and scale with specialists that handle the repetitive work — so your human team stays focused on what matters.
+          </p>
+
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+            <Link to="/agents" className="btn-primary btn-lg">
+              Meet the team <ArrowRight size={18} aria-hidden="true" />
+            </Link>
+            <Link to="/pricing" className="btn-secondary btn-lg">
+              See pricing
+            </Link>
+          </div>
+
+          <ul className="mt-10 grid max-w-lg grid-cols-3 gap-4">
+            {BENEFITS.map(({ icon: Icon, title }) => (
+              <li key={title} className="flex items-start gap-2 text-sm text-zinc-300">
+                <Icon size={18} className="mt-0.5 shrink-0 text-brand-ink" aria-hidden="true" />
+                {title}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+          className="relative mx-auto w-full max-w-lg"
+        >
+          <div className="relative aspect-[4/5] overflow-hidden rounded-[2.5rem] border border-line shadow-2xl lg:aspect-square">
+            <AutoVideo
+              src="/animation homepage.mp4"
+              label="Animated preview of res AI employees at work"
+              className="h-full w-full object-cover"
+              style={{ objectPosition: "75% center" }}
+            />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" aria-hidden="true" />
+          </div>
+          {/* Floating status card */}
+          <div className="absolute -bottom-6 -left-4 flex items-center gap-3 rounded-2xl border border-line bg-surface-2/90 px-4 py-3 shadow-xl backdrop-blur-md sm:-left-8">
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-400/15 text-emerald-300">
+              <Zap size={18} aria-hidden="true" />
+            </div>
+            <div>
+              <p className="text-sm font-bold">1,284 tasks done</p>
+              <p className="text-xs text-subtle">while you slept</p>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Stats strip */}
+      <div className="container-page pb-8">
+        <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-[2rem] border border-line bg-line md:grid-cols-4">
+          {STATS.map((s) => (
+            <div key={s.label} className="flex flex-col bg-surface px-6 py-6 text-center">
+              <dt className="order-2 mt-1 text-xs font-bold uppercase tracking-[0.14em] text-subtle">{s.label}</dt>
+              <dd className="font-display text-3xl font-bold tracking-tight">{s.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
   return (
-    <PageWrapper>
-      <main className="bg-black text-white overflow-x-hidden min-h-screen relative">
-        {/* Background blob */}
-        <motion.div
-          variants={backgroundGradient}
-          animate="animate"
-          className="fixed top-[-20%] right-[-10%] w-[800px] h-[800px] bg-gradient-to-br from-red-600/20 to-purple-600/20 rounded-full blur-[120px] pointer-events-none"
-        />
+    <>
+      <Hero />
 
-        {/* =========================
-            1) HERO
-           ========================= */}
-        <section className="min-h-screen flex flex-col justify-center px-6 md:px-8 py-20">
-          <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 1, delay: 0.2 }}
-              className="relative z-10"
-            >
-              <div className="inline-flex items-center gap-2 mb-5 bg-white/5 border border-white/10 px-4 py-2 rounded-full text-[10px] uppercase tracking-widest text-zinc-300">
-                <span className="w-2 h-2 rounded-full bg-red-600" />
-                Always-on AI teammates for real work
-              </div>
+      <AgentsCarousel />
 
-              <h1 className="text-5xl md:text-6xl lg:text-7xl xl:text-[85px] font-black leading-[0.95] tracking-tighter mb-6 md:mb-8 break-words">
-                AI Employees: <br />
-                Your Helpers That <span className="text-red-600">Never Sleep.</span>
-              </h1>
-
-              <p className="text-lg md:text-xl text-zinc-100 max-w-md mb-8 md:mb-10 leading-relaxed">
-                Build, grow, and scale with specialists that handle repetitive work—so your human team stays focused.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link to="/agents" className="w-full sm:w-auto">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="w-full sm:w-auto bg-red-600 text-white px-10 py-5 rounded-full text-lg font-bold shadow-2xl shadow-red-500/20 uppercase tracking-widest"
-                  >
-                    View Team
-                  </motion.button>
-                </Link>
-
-                <Link to="/pricing" className="w-full sm:w-auto">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="w-full sm:w-auto bg-zinc-900 border border-white/10 text-white px-10 py-5 rounded-full text-lg font-bold uppercase tracking-widest hover:bg-zinc-800 transition"
-                  >
-                    See Pricing
-                  </motion.button>
-                </Link>
-              </div>
-
-              <div className="mt-10 flex flex-wrap gap-3 text-[11px] text-zinc-500 uppercase tracking-widest font-bold">
-                <span className="px-3 py-2 rounded-full border border-white/10 bg-white/5">No busywork</span>
-                <span className="px-3 py-2 rounded-full border border-white/10 bg-white/5">Fast output</span>
-                <span className="px-3 py-2 rounded-full border border-white/10 bg-white/5">Brand-safe tone</span>
-              </div>
-            </motion.div>
-
-            {/* Hero media */}
-            <div className="relative flex justify-center items-center mt-10 lg:mt-0">
-              <div className="w-full max-w-lg aspect-[4/5] lg:aspect-square rounded-[3rem] overflow-hidden border border-white/10 shadow-2xl relative z-10">
-                <video
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-full h-full object-cover"
-                  style={{ objectPosition: "75% center" }}
-                >
-                  <source src="/animation homepage.mp4" type="video/mp4" />
-                </video>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
-              </div>
-              <div className="absolute inset-0 bg-red-600/20 blur-[100px] -z-10 rounded-full" />
-            </div>
-          </div>
-        </section>
-
-        {/* =========================
-            2) TRUST STRIP
-           ========================= */}
-        <section className="px-6 md:px-8 pb-10">
-          <div className="max-w-7xl mx-auto">
-            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 md:p-8 flex flex-col md:flex-row gap-6 md:gap-10 items-center justify-between">
-              <div className="text-center md:text-left">
-                <div className="text-2xl md:text-3xl font-black italic tracking-tighter">Ship more. Stress less.</div>
-                <p className="text-zinc-300 mt-2 text-sm md:text-base">
-                  Your team gets time back—without losing quality or control.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-3 gap-4 text-center w-full md:w-auto">
-                <div className="rounded-2xl border border-white/10 bg-black/40 px-5 py-4">
-                  <div className="text-2xl font-black">24/7</div>
-                  <div className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold mt-1">Availability</div>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-black/40 px-5 py-4">
-                  <div className="text-2xl font-black">Fast</div>
-                  <div className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold mt-1">Turnaround</div>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-black/40 px-5 py-4">
-                  <div className="text-2xl font-black">Clean</div>
-                  <div className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold mt-1">Output</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* =========================
-            3) ✅ REPLACED: Top members grid
-               WITH: Agents Carousel (like screenshot)
-           ========================= */}
-        <AgentsCarousel
-          title="Choose your specialists"
-          subtitle="Swipe through your AI employees. Each one is built for a specific role."
-        />
-
-        {/* =========================
-            4) USE-CASE PROMPTS
-           ========================= */}
-        <section className="py-20 md:py-28 px-6 md:px-8 bg-zinc-950/50">
-          <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 md:gap-16 items-start">
-            <RevealOnScroll>
-              <h2 className="text-4xl md:text-6xl font-black italic tracking-tighter leading-none">
-                Tell them what to do.
-                <br />
-                They do it.
-              </h2>
-              <p className="text-zinc-300 mt-6 max-w-xl">
-                Simple prompts → structured output. You can refine, approve, and ship—without the back-and-forth.
-              </p>
-
-              <div className="mt-8 flex gap-4">
-                <Link to="/crm">
-                  <button className="bg-white text-black px-8 py-4 rounded-full font-black uppercase tracking-widest text-xs hover:bg-zinc-200 transition">
-                    CRM
-                  </button>
-                </Link>
-                <Link to="/website-management">
-                  <button className="border border-white/15 bg-white/5 text-white px-8 py-4 rounded-full font-black uppercase tracking-widest text-xs hover:bg-white/10 transition">
-                    Website Mgmt
-                  </button>
-                </Link>
-              </div>
-            </RevealOnScroll>
-
-            <motion.div
-              variants={containerStagger}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, margin: "-10% 0px" }}
-              className="space-y-5"
-            >
-              {USE_CASES.map((u, idx) => (
-                <motion.div
-                  key={idx}
-                  variants={itemStagger}
-                  className="rounded-[2rem] border border-white/10 bg-black/40 p-6 md:p-7 hover:border-red-500/30 transition"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-2xl bg-red-600/15 border border-red-600/20 flex items-center justify-center text-red-400 font-black">
-                      {u.icon}
+      {/* Live demo */}
+      <section className="border-y border-line bg-surface py-20 md:py-28">
+        <div className="container-page grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
+          <div>
+            <SectionHeading align="left" eyebrow="See it work" title={<>Tell them what to do.<br />They do it.</>}>
+              Simple prompts, structured output. Refine, approve, and ship — without the back-and-forth.
+            </SectionHeading>
+            <RevealOnScroll delay={0.1}>
+              <ul className="mt-8 space-y-4">
+                {BENEFITS.map(({ icon: Icon, title, body }) => (
+                  <li key={title} className="flex gap-4">
+                    <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-brand/25 bg-brand/10 text-brand-ink">
+                      <Icon size={20} aria-hidden="true" />
                     </div>
                     <div>
-                      <div className="text-white font-black tracking-tight">{u.title}</div>
-                      <div className="text-zinc-300 text-sm leading-relaxed mt-2">{u.desc}</div>
+                      <p className="font-bold">{title}</p>
+                      <p className="text-sm text-muted">{body}</p>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
-        </section>
-
-        {/* =========================
-            5) HOW IT WORKS
-           ========================= */}
-        <section className="py-20 md:py-28 px-6 md:px-8">
-          <div className="max-w-7xl mx-auto">
-            <RevealOnScroll>
-              <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
-                <span className="inline-block py-1 px-3 rounded-full bg-red-600/10 border border-red-600/20 text-[10px] font-bold uppercase tracking-widest text-red-500 mb-6">
-                  Setup in minutes
-                </span>
-                <h2 className="text-4xl md:text-6xl font-black italic tracking-tighter">
-                  Train your helpers to sound like you.
-                </h2>
-                <p className="text-zinc-300 mt-5">
-                  Add instructions, brand notes, and examples. The more context you provide, the more consistent the output.
-                </p>
-              </div>
+                  </li>
+                ))}
+              </ul>
             </RevealOnScroll>
-
-            <motion.div
-              variants={containerStagger}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, margin: "-10% 0px" }}
-              className="grid grid-cols-1 md:grid-cols-3 gap-6"
-            >
-              {[
-                { num: "01", title: "Create a workspace", body: "Set your business profile: goals, tone, offers, and your main audience." },
-                { num: "02", title: "Connect your tools", body: "Bring in the apps you already use so tasks flow without copy/paste." },
-                { num: "03", title: "Assign repeatable work", body: "Turn recurring tasks into simple prompts and let the helper run." },
-              ].map((s) => (
-                <motion.div
-                  key={s.num}
-                  variants={itemStagger}
-                  className="rounded-[2.5rem] border border-white/10 bg-zinc-900/40 p-8 relative overflow-hidden"
-                >
-                  <div className="absolute -top-10 -right-10 text-[140px] font-black italic text-red-600/10 select-none">
-                    {s.num}
-                  </div>
-                  <div className="relative z-10">
-                    <h3 className="text-2xl font-black tracking-tight">{s.title}</h3>
-                    <p className="text-zinc-300 mt-4 leading-relaxed">{s.body}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
           </div>
-        </section>
+          <RevealOnScroll delay={0.15}>
+            <ChatDemo />
+          </RevealOnScroll>
+        </div>
+      </section>
 
-        {/* =========================
-            6) INTEGRATIONS GRID
-           ========================= */}
-        <section className="py-20 md:py-28 px-6 md:px-8 bg-zinc-950/50">
-          <div className="max-w-7xl mx-auto">
-            <RevealOnScroll>
-              <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10">
-                <div>
-                  <h2 className="text-4xl md:text-6xl font-black italic tracking-tighter">
-                    Works with your stack.
-                  </h2>
-                  <p className="text-zinc-300 mt-5 max-w-2xl">
-                    Don’t change how you work. Plug helpers into the tools your team already trusts.
-                  </p>
+      {/* How it works */}
+      <section className="container-page py-20 md:py-28">
+        <SectionHeading eyebrow="Setup in minutes" title="Train your helpers to sound like you.">
+          Add instructions, brand notes, and examples. The more context you provide, the more consistent the output.
+        </SectionHeading>
+
+        <motion.ol {...inViewStagger} className="mt-14 grid gap-6 md:grid-cols-3">
+          {STEPS.map(({ icon: Icon, title, body }, i) => (
+            <motion.li key={title} variants={itemStagger} className="card relative overflow-hidden p-8">
+              <span className="absolute -right-4 -top-8 select-none font-display text-[140px] font-bold leading-none text-white/[0.04]" aria-hidden="true">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-brand text-white">
+                <Icon size={22} aria-hidden="true" />
+              </div>
+              <p className="mt-6 text-xs font-bold uppercase tracking-[0.16em] text-subtle">Step {i + 1}</p>
+              <h3 className="mt-2 text-2xl font-bold tracking-tight">{title}</h3>
+              <p className="mt-3 leading-relaxed text-muted">{body}</p>
+            </motion.li>
+          ))}
+        </motion.ol>
+      </section>
+
+      {/* Services teaser */}
+      <section className="container-page pb-20 md:pb-28">
+        <div className="grid gap-6 md:grid-cols-2">
+          {[
+            { to: "/crm", eyebrow: "Service", title: "CRM that closes deals", body: "Automated outreach, lead scoring, and a pipeline that never forgets a follow-up.", icon: MessageSquare },
+            { to: "/website-management", eyebrow: "Service", title: "Websites that never sleep", body: "Monitoring, speed, security, and new features — handled by our team.", icon: ShieldCheck },
+          ].map(({ to, eyebrow, title, body, icon: Icon }) => (
+            <RevealOnScroll key={to}>
+              <Link to={to} className="card card-hover group flex h-full flex-col p-8 md:p-10">
+                <div className="flex items-start justify-between">
+                  <div className="grid h-12 w-12 place-items-center rounded-2xl border border-line bg-white/5 text-brand-ink">
+                    <Icon size={22} aria-hidden="true" />
+                  </div>
+                  <ArrowRight size={22} className="text-subtle transition group-hover:translate-x-1 group-hover:text-white" aria-hidden="true" />
                 </div>
-                <Link to="/contact" className="shrink-0">
-                  <button className="border border-white/15 bg-white/5 text-white px-8 py-4 rounded-full font-black uppercase tracking-widest text-xs hover:bg-white/10 transition">
-                    Request Integration
-                  </button>
-                </Link>
-              </div>
+                <p className="mt-8 text-xs font-bold uppercase tracking-[0.16em] text-subtle">{eyebrow}</p>
+                <h3 className="mt-2 text-3xl font-bold tracking-tight">{title}</h3>
+                <p className="mt-3 text-muted">{body}</p>
+              </Link>
             </RevealOnScroll>
+          ))}
+        </div>
+      </section>
 
-            <motion.div
-              variants={containerStagger}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, margin: "-10% 0px" }}
-              className="grid grid-cols-2 md:grid-cols-4 gap-5"
-            >
-              {INTEGRATIONS.map((x) => (
-                <motion.div
-                  key={x.name}
-                  variants={itemStagger}
-                  className="rounded-[2rem] border border-white/10 bg-black/40 p-6 hover:border-red-500/30 transition"
-                >
-                  <div className="text-white font-black">{x.name}</div>
-                  <div className="text-zinc-500 text-xs uppercase tracking-widest font-bold mt-2">{x.note}</div>
-                </motion.div>
-              ))}
-            </motion.div>
+      {/* Integrations */}
+      <section className="border-y border-line bg-surface py-20 md:py-28">
+        <div className="container-page">
+          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <SectionHeading align="left" eyebrow="Integrations" title="Works with your stack.">
+              Don't change how you work. Plug helpers into the tools your team already trusts.
+            </SectionHeading>
+            <Link to="/contact" className="btn-secondary shrink-0">
+              Request an integration
+            </Link>
           </div>
-        </section>
 
-        {/* =========================
-            7) TESTIMONIALS
-           ========================= */}
-        <section className="py-20 md:py-28 px-6 md:px-8 bg-zinc-950/50">
-          <div className="max-w-7xl mx-auto">
-            <RevealOnScroll>
-              <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
-                <h2 className="text-4xl md:text-6xl font-black italic tracking-tighter">
-                  Real teams. Real output.
-                </h2>
-                <p className="text-zinc-300 mt-5">
-                  The goal isn’t “more AI”. The goal is less friction and more progress.
-                </p>
-              </div>
-            </RevealOnScroll>
-
-            <motion.div
-              variants={containerStagger}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, margin: "-10% 0px" }}
-              className="grid grid-cols-1 md:grid-cols-3 gap-6"
-            >
-              {TESTIMONIALS.map((t, idx) => (
-                <motion.div
-                  key={idx}
-                  variants={itemStagger}
-                  className="rounded-[2.5rem] border border-white/10 bg-black/40 p-8"
-                >
-                  <div className="text-zinc-100 leading-relaxed">“{t.quote}”</div>
-                  <div className="mt-6 pt-6 border-t border-white/10">
-                    <div className="font-black">{t.name}</div>
-                    <div className="text-zinc-500 text-xs uppercase tracking-widest font-bold mt-2">{t.meta}</div>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
-        </section>
-
-        {/* =========================
-            8) FINAL CTA
-           ========================= */}
-        <section className="py-20 md:py-28 px-6 md:px-8">
-          <div className="max-w-7xl mx-auto">
-            <RevealOnScroll>
-              <div className="rounded-[3rem] border border-white/10 bg-zinc-900/40 p-10 md:p-16 text-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-red-600/10 blur-[120px] -z-10 pointer-events-none" />
-                <h2 className="text-3xl md:text-5xl font-black italic tracking-tighter mb-6">
-                  Ready to build your AI team?
-                </h2>
-                <p className="text-zinc-200 text-lg max-w-2xl mx-auto mb-10">
-                  Start with one helper, prove ROI, then scale. Keep your workflow. Remove the repetitive work.
-                </p>
-
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Link to="/pricing">
-                    <button className="bg-red-600 text-white px-10 py-5 rounded-full text-sm font-black uppercase tracking-widest hover:bg-red-700 transition hover:scale-105 active:scale-95 shadow-lg shadow-red-600/20">
-                      Get Started
-                    </button>
-                  </Link>
-                  <Link to="/contact">
-                    <button className="border border-white/15 bg-white/5 text-white px-10 py-5 rounded-full text-sm font-black uppercase tracking-widest hover:bg-white/10 transition">
-                      Talk to Us
-                    </button>
-                  </Link>
+          <motion.ul {...inViewStagger} className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-4">
+            {INTEGRATIONS.map(({ name, note, icon: Icon }) => (
+              <motion.li key={name} variants={itemStagger} className="card card-hover flex items-center gap-4 p-5">
+                <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white/5 text-zinc-200">
+                  <Icon size={20} aria-hidden="true" />
                 </div>
-              </div>
-            </RevealOnScroll>
-          </div>
-        </section>
-      </main>
-    </PageWrapper>
+                <div className="min-w-0">
+                  <p className="truncate font-bold">{name}</p>
+                  <p className="truncate text-sm text-subtle">{note}</p>
+                </div>
+              </motion.li>
+            ))}
+          </motion.ul>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="container-page py-20 md:py-28">
+        <SectionHeading eyebrow="Customers" title="Real teams. Real output.">
+          The goal isn't "more AI". The goal is less friction and more progress.
+        </SectionHeading>
+
+        <motion.ul {...inViewStagger} className="mt-14 grid gap-6 md:grid-cols-3">
+          {TESTIMONIALS.map((t) => (
+            <motion.li key={t.name} variants={itemStagger} className="card flex flex-col p-8">
+              <figure className="flex h-full flex-col">
+                <div className="mb-5 flex gap-1 text-brand-ink" aria-label="5 out of 5 stars">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <svg key={i} viewBox="0 0 20 20" className="h-4 w-4 fill-current" aria-hidden="true">
+                      <path d="M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 14.8l-5.2 2.8 1-5.8L1.5 7.7l5.9-.9L10 1.5z" />
+                    </svg>
+                  ))}
+                </div>
+                <blockquote className="flex-1 text-lg leading-relaxed text-zinc-100">"{t.quote}"</blockquote>
+                <figcaption className="mt-6 border-t border-line pt-5">
+                  <p className="font-bold">{t.name}</p>
+                  <p className="mt-1 text-sm text-subtle">{t.meta}</p>
+                </figcaption>
+              </figure>
+            </motion.li>
+          ))}
+        </motion.ul>
+      </section>
+
+      <CTASection />
+    </>
   );
 }
