@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { CircleAlert, FileText, Pencil, Play, RotateCcw } from "lucide-react";
 import useTaskLive from "../hooks/useTaskLive";
@@ -17,6 +17,14 @@ export default function TaskCard({ initialTask, canStart, onRetried }) {
   const [busy, setBusy] = useState(false);
   const balance = me?.credits?.balance ?? 0;
   const short = balance < task.credits;
+
+  // A task that finishes or fails while we watch changes the credit balance (spent or refunded).
+  const lastStatus = useRef(task.status);
+  useEffect(() => {
+    const changed = lastStatus.current !== task.status;
+    lastStatus.current = task.status;
+    if (changed && (task.status === "done" || task.status === "failed")) refreshMe();
+  }, [task.status, refreshMe]);
 
   const start = async () => {
     setBusy(true);
@@ -37,8 +45,17 @@ export default function TaskCard({ initialTask, canStart, onRetried }) {
   };
 
   const retry = async () => {
-    const { task: fresh } = await api(`/tasks/${task.id}/retry`, { method: "POST" });
-    onRetried?.(fresh);
+    if (busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const { task: fresh } = await api(`/tasks/${task.id}/retry`, { method: "POST" });
+      onRetried?.(fresh);
+    } catch {
+      setError("Couldn't retry the task. Please try again.");
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -87,8 +104,9 @@ export default function TaskCard({ initialTask, canStart, onRetried }) {
 
       {task.status === "failed" && (
         <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
-          <p className="flex items-center gap-2 text-red-300" role="alert"><CircleAlert size={16} aria-hidden="true" /> {task.error}</p>
-          <button type="button" onClick={retry} className="btn-secondary min-h-11 px-4 py-2 text-sm"><RotateCcw size={16} aria-hidden="true" /> Retry</button>
+          {/* The task's own failure is history, not news: plain text. Only errors from the user's click alert. */}
+          <p className="flex items-center gap-2 text-red-300"><CircleAlert size={16} aria-hidden="true" /> {task.error}</p>
+          <button type="button" onClick={retry} disabled={busy} className="btn-secondary min-h-11 px-4 py-2 text-sm"><RotateCcw size={16} aria-hidden="true" /> Retry</button>
         </div>
       )}
 
