@@ -1,7 +1,7 @@
 import type { Db } from "../db.js";
 import { failTask } from "../credits.js";
 import type { BusinessProfile } from "../agents/types.js";
-import type { RunnerIO, TaskRow } from "./runTask.js";
+import { TaskError, type RunnerIO, type TaskRow } from "./runTask.js";
 
 export async function claimTask(db: Db, taskId: string): Promise<TaskRow | null> {
   const { rows } = await db.query<TaskRow>(
@@ -60,14 +60,16 @@ export function dbRunnerIO(db: Db): RunnerIO {
       await db.query("insert into task_events (task_id, user_id, type, text) values ($1, $2, $3, $4)", [task.id, task.user_id, type, text.slice(0, 300)]);
     },
     async complete(task, d, costUsd) {
-      // One statement: deliverable, task status and the thread message land together.
+      // The task update runs first and gates every insert: if the task is no longer 'running'
+      // (e.g. the sweeper already failed and refunded it), `t` returns no row, so `d`/`m`/`th`
+      // insert nothing — no orphan deliverable, no message posted for a task that's already failed.
       const { rows } = await db.query<{ id: string }>(
-        `with d as (
+        `with t as (
+           update tasks set status = 'done', finished_at = now(), cost_usd = cost_usd + $7
+           where id = $1 and status = 'running' returning id, thread_id, user_id
+         ), d as (
            insert into deliverables (task_id, user_id, agent_id, title, body_md, sources, partial)
-           values ($1, $2, $3, $4, $5, $6::jsonb, $7) returning id
-         ), t as (
-           update tasks set status = 'done', finished_at = now(), cost_usd = cost_usd + $8
-           where id = $1 and status = 'running' returning thread_id, user_id
+           select t.id, t.user_id, $2, $3, $4, $5::jsonb, $6 from t returning id
          ), m as (
            insert into messages (thread_id, user_id, role, content)
            select t.thread_id, t.user_id, 'assistant', jsonb_build_array(jsonb_build_object('type', 'deliverable', 'deliverableId', d.id))
@@ -76,8 +78,9 @@ export function dbRunnerIO(db: Db): RunnerIO {
            update threads set updated_at = now() where id = (select thread_id from t) returning 1
          )
          select id from d`,
-        [task.id, task.user_id, task.agent_id, d.title, d.body_md, JSON.stringify(d.sources), d.partial, costUsd],
+        [task.id, task.agent_id, d.title, d.body_md, JSON.stringify(d.sources), d.partial, costUsd],
       );
+      if (!rows[0]) throw new TaskError("Buddy took too long and stopped. Your credits were refunded.");
       return rows[0].id;
     },
   };

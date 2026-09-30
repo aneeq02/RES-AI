@@ -72,6 +72,21 @@ describe("processTaskJob", () => {
     expect(await creditBalance(t.db, userId)).toBe(10);
     errSpy.mockRestore();
   });
+
+  it("does not save an orphan deliverable if the sweeper already failed the task mid-run", async () => {
+    const sweptMidRun: TaskLlm = {
+      run: async () => {
+        // Simulate the sweeper racing in and failing+refunding the task while this run is in flight.
+        await t.db.query("select public.fail_task($1, 'swept')", [taskId]);
+        return saving.run(undefined as any, undefined as any);
+      },
+    };
+    expect(await processTaskJob(deps(sweptMidRun), taskId)).toBe("failed");
+    expect((await task()).status).toBe("failed");
+    expect((await t.db.query("select 1 from deliverables where task_id = $1", [taskId])).rows).toHaveLength(0);
+    expect((await t.db.query("select 1 from messages where thread_id = $1", [threadId])).rows).toHaveLength(0);
+    expect(await creditBalance(t.db, userId)).toBe(10);
+  });
 });
 
 describe("isRetryable", () => {
