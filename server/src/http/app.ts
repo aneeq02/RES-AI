@@ -44,6 +44,8 @@ const BriefBody = z.object({ summary: z.string().trim().min(1).max(500), details
 
 const TASK_SELECT = `select t.*, d.id as deliverable_id from tasks t left join deliverables d on d.task_id = t.id`;
 const DRAFT_LIMIT = 5;
+// Subscription statuses after which the customer may start a fresh checkout.
+const ENDED = new Set(["canceled", "incomplete_expired"]);
 
 export function createApp(deps: AppDeps) {
   const { db } = deps;
@@ -256,7 +258,9 @@ export function createApp(deps: AppDeps) {
     const user = c.get("user");
     const body = await c.req.json().catch(() => null);
     if (!isPlanId(body?.planId)) return c.json({ error: "invalid_plan" }, 400);
-    if (await requirePlan(user.id)) return c.json({ error: "already_subscribed" }, 409);
+    // Any live subscription (including past_due/incomplete/unpaid) blocks a second one: fixing payment happens in the portal.
+    const existing = await getSubscription(db, user.id);
+    if (existing && !ENDED.has(existing.status)) return c.json({ error: "already_subscribed" }, 409);
     return c.json({ url: await createCheckoutSession(db, deps.stripe, { userId: user.id, email: user.email, planId: body.planId, appUrl: deps.appUrl }) });
   });
 

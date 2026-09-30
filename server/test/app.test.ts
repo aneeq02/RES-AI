@@ -199,6 +199,40 @@ describe("api", () => {
     expect(res.status).toBe(400);
   });
 
+  describe("POST /billing/checkout with an existing subscription", () => {
+    const stripe = {
+      customers: { create: async () => ({ id: "cus_new" }) },
+      prices: { list: async () => ({ data: [{ id: "price_1" }] }) },
+      checkout: { sessions: { create: async () => ({ url: "https://checkout.stripe.test/s" }) } },
+    } as any;
+    const withStatus = (status: string) =>
+      t.db.query(
+        `insert into subscriptions (user_id, stripe_customer_id, stripe_subscription_id, plan_id, status, started_at)
+         values ($1, 'cus', 'sub_ada', '1-month', $2, '2026-09-01')`,
+        [userId, status],
+      );
+
+    for (const status of ["past_due", "incomplete", "unpaid", "active"]) {
+      it(`409s when the subscription is ${status}, so a second subscription can't be opened`, async () => {
+        app = makeApp({ stripe });
+        await withStatus(status);
+        const res = await call("POST", "/billing/checkout", "ada", { planId: "1-month" });
+        expect(res.status).toBe(409);
+        expect(await res.json()).toEqual({ error: "already_subscribed" });
+      });
+    }
+
+    for (const status of ["canceled", "incomplete_expired"]) {
+      it(`lets a ${status} subscriber check out again`, async () => {
+        app = makeApp({ stripe });
+        await withStatus(status);
+        const res = await call("POST", "/billing/checkout", "ada", { planId: "1-month" });
+        expect(res.status).toBe(200);
+        expect(await res.json()).toEqual({ url: "https://checkout.stripe.test/s" });
+      });
+    }
+  });
+
   it("404s the webhook route when no webhook secret is configured", async () => {
     const res = await app.request("/stripe/webhook", { method: "POST", headers: { "stripe-signature": "t=1,v1=x" }, body: "{}" });
     expect(res.status).toBe(404);
