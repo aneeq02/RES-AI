@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { LoaderCircle } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { safeNext } from "../lib/safeNext";
 
 // supabase-js finishes the sign-in from the URL on load; we wait for the session and continue.
 export default function AuthCallback() {
@@ -9,12 +10,11 @@ export default function AuthCallback() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const [timedOut, setTimedOut] = useState(false);
-  const next = params.get("next") || "/app";
-  const safeNext = next.startsWith("/") && !next.startsWith("//") ? next : "/app";
+  const target = safeNext(params.get("next"), "/app");
 
   useEffect(() => {
-    if (session) navigate(safeNext, { replace: true });
-  }, [session, safeNext, navigate]);
+    if (session) navigate(target, { replace: true });
+  }, [session, target, navigate]);
 
   useEffect(() => {
     const id = setTimeout(() => setTimedOut(true), 10000);
