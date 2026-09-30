@@ -69,6 +69,10 @@ fs.writeFileSync(
 User-agent: *
 Allow: /
 Disallow: /checkout
+Disallow: /app
+Disallow: /login
+Disallow: /signup
+Disallow: /auth
 
 # AI search & answer engines are welcome (citations in ChatGPT, Claude, Perplexity, Gemini).
 User-agent: OAI-SearchBot
@@ -78,6 +82,10 @@ User-agent: Claude-User
 User-agent: PerplexityBot
 Allow: /
 Disallow: /checkout
+Disallow: /app
+Disallow: /login
+Disallow: /signup
+Disallow: /auth
 
 Sitemap: ${SITE_URL}/sitemap.xml
 `,

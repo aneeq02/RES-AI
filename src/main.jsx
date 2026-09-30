@@ -14,11 +14,14 @@ const app = (
 );
 
 // Production pages are prerendered to static HTML (scripts/prerender.mjs), so hydrate
-// them; the dev server serves an empty root, so render from scratch there.
-if (container.firstElementChild) {
+// them; the dev server serves an empty root, and /app is client-only, so render from scratch there.
+const clientOnly = window.location.pathname.startsWith("/app");
+if (container.firstElementChild && !clientOnly) {
   // Drop the prerendered head tags; <Seo> re-creates the right ones for the current URL
   // (avoids duplicates if a host ever serves one page's HTML for another URL).
   document.head.querySelectorAll("[data-ssr]").forEach((n) => n.remove());
   ReactDOM.hydrateRoot(container, app);
+} else {
+  container.replaceChildren();
+  ReactDOM.createRoot(container).render(app);
 }
-else ReactDOM.createRoot(container).render(app);

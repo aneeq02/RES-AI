@@ -92,6 +92,9 @@ export const ROUTES = {
     description: "Complete your res order.",
     index: false,
   },
+  "/login": { title: "Sign in | res", description: "Sign in to your res workspace.", index: false },
+  "/signup": { title: "Create your account | res", description: "Create your res account.", index: false },
+  "/auth/callback": { title: "Signing in | res", description: "Signing you in to res.", index: false },
   "/404": {
     title: "Page Not Found | res",
     description: "The page you were looking for doesn't exist.",

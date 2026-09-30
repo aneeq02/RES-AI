@@ -21,7 +21,7 @@ export default function GetStartedModal({ isOpen, onClose }) {
     setError(msg);
     if (msg) return;
     onClose();
-    navigate("/checkout", { state: { email: email.trim() } });
+    navigate("/signup", { state: { email: email.trim() } });
   };
 
   return (
