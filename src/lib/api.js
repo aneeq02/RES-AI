@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { getSupabase } from "./supabase";
 import { createSseParser } from "./sse";
 
 const API = (import.meta.env.VITE_API_URL || "http://localhost:8787").replace(/\/$/, "");
@@ -12,6 +12,7 @@ export class ApiError extends Error {
 }
 
 async function headers() {
+  const supabase = await getSupabase();
   const { data } = (await supabase?.auth.getSession()) ?? { data: {} };
   const token = data?.session?.access_token;
   return { "content-type": "application/json", ...(token ? { authorization: `Bearer ${token}` } : {}) };

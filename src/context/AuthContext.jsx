@@ -1,17 +1,28 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { supabase } from "../lib/supabase";
+import { getSupabase, supabaseConfigured } from "../lib/supabase";
 
 const AuthContext = createContext({ session: null, loading: true });
 
 export function AuthProvider({ children }) {
-  // No Supabase client (e.g. env unset) means there's nothing to wait on: start settled.
-  const [state, setState] = useState(() => (supabase ? { session: null, loading: true } : { session: null, loading: false }));
+  // No Supabase config (e.g. env unset) means there's nothing to wait on: start settled.
+  // Depends only on build-time env, so SSR and the first client render agree.
+  const [state, setState] = useState(() => (supabaseConfigured ? { session: null, loading: true } : { session: null, loading: false }));
 
   useEffect(() => {
-    if (!supabase) return;
-    supabase.auth.getSession().then(({ data }) => setState({ session: data.session, loading: false }));
-    const { data } = supabase.auth.onAuthStateChange((_event, session) => setState({ session, loading: false }));
-    return () => data.subscription.unsubscribe();
+    if (!supabaseConfigured) return;
+    let cancelled = false;
+    let subscription = null;
+    getSupabase()
+      .then((supabase) => {
+        if (cancelled || !supabase) return;
+        supabase.auth.getSession().then(({ data }) => { if (!cancelled) setState({ session: data.session, loading: false }); });
+        subscription = supabase.auth.onAuthStateChange((_event, session) => { if (!cancelled) setState({ session, loading: false }); }).data.subscription;
+      })
+      .catch(() => { if (!cancelled) setState({ session: null, loading: false }); });
+    return () => {
+      cancelled = true;
+      subscription?.unsubscribe();
+    };
   }, []);
 
   return <AuthContext.Provider value={state}>{children}</AuthContext.Provider>;

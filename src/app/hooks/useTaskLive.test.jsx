@@ -5,30 +5,32 @@ import useTaskLive from "./useTaskLive";
 
 vi.mock("../../lib/api", () => ({ api: vi.fn(() => Promise.resolve({ task: { status: "running" }, events: [], deliverable: null })) }));
 
-const channelNames = [];
-function makeFakeChannel() {
+const { channelNames, removeChannel } = vi.hoisted(() => ({ channelNames: [], removeChannel: vi.fn() }));
+function makeFakeChannel(name) {
   const chain = {
+    name,
     on: () => chain,
     subscribe: () => chain,
   };
   return chain;
 }
-vi.mock("../../lib/supabase", () => ({
-  supabase: {
-    channel: (name) => { channelNames.push(name); return makeFakeChannel(); },
-    removeChannel: vi.fn(),
-  },
-}));
+vi.mock("../../lib/supabase", () => {
+  const client = {
+    channel: (name) => { channelNames.push(name); return makeFakeChannel(name); },
+    removeChannel,
+  };
+  return { supabaseConfigured: true, getSupabase: async () => client };
+});
 
-/** Mounts a component calling the hook and returns an unmount function. */
-function mountHook(taskId, initialTask, { strict = false } = {}) {
+/** Mounts a component calling the hook (letting the lazy client resolve) and returns an unmount function. */
+async function mountHook(taskId, initialTask, { strict = false } = {}) {
   let container;
   function Harness() {
     useTaskLive(taskId, initialTask);
     return null;
   }
   const tree = strict ? <React.StrictMode><Harness /></React.StrictMode> : <Harness />;
-  act(() => {
+  await act(async () => {
     container = document.createElement("div");
     document.body.appendChild(container);
     const root = createRoot(container);
@@ -42,12 +44,12 @@ function mountHook(taskId, initialTask, { strict = false } = {}) {
 }
 
 describe("useTaskLive realtime channel topic", () => {
-  afterEach(() => { channelNames.length = 0; });
+  afterEach(() => { channelNames.length = 0; removeChannel.mockClear(); });
 
-  it("gives two hook instances for the same active task distinct channel topics", () => {
+  it("gives two hook instances for the same active task distinct channel topics", async () => {
     const task = { id: "t1", status: "running" };
-    const unmountA = mountHook("t1", task);
-    const unmountB = mountHook("t1", task);
+    const unmountA = await mountHook("t1", task);
+    const unmountB = await mountHook("t1", task);
 
     expect(channelNames.length).toBe(2);
     expect(channelNames[0]).not.toBe(channelNames[1]);
@@ -58,31 +60,37 @@ describe("useTaskLive realtime channel topic", () => {
     unmountB();
   });
 
-  it("gives a remounted instance a fresh topic distinct from the one that left", () => {
+  it("gives a remounted instance a fresh topic distinct from the one that left", async () => {
     const task = { id: "t2", status: "running" };
-    const unmountFirst = mountHook("t2", task);
+    const unmountFirst = await mountHook("t2", task);
     const firstTopic = channelNames[0];
     unmountFirst();
 
-    const unmountSecond = mountHook("t2", task);
+    const unmountSecond = await mountHook("t2", task);
     const secondTopic = channelNames[1];
     unmountSecond();
 
     expect(secondTopic).not.toBe(firstTopic);
   });
 
-  it("does not reuse the topic across StrictMode's own effect cleanup + re-run on one instance", () => {
-    const task = { id: "t3", status: "running" };
-    const unmount = mountHook("t3", task, { strict: true });
+  it("removes its channel on unmount", async () => {
+    const unmount = await mountHook("t4", { id: "t4", status: "running" });
+    expect(removeChannel).not.toHaveBeenCalled();
+    unmount();
+    expect(removeChannel).toHaveBeenCalledTimes(1);
+    expect(removeChannel.mock.calls[0][0].name).toBe(channelNames[0]);
+  });
 
-    // React 19 StrictMode (dev) mounts, runs effects, cleans them up, and re-runs them once —
-    // all synchronously within this one mountHook() call, on what is logically a single
-    // component instance. A topic that doesn't vary per effect run (e.g. one derived from
-    // useId(), which is stable for the life of the instance) would be recorded twice here.
+  it("subscribes once under StrictMode: the cleaned-up first effect run never opens a channel", async () => {
+    const task = { id: "t3", status: "running" };
+    const unmount = await mountHook("t3", task, { strict: true });
+
+    // React 19 StrictMode (dev) mounts, runs effects, cleans them up, and re-runs them once.
+    // The client loads asynchronously, so the first run is cancelled before it can subscribe.
     const t3Topics = channelNames.filter((n) => n.startsWith("task-t3-"));
-    expect(t3Topics.length).toBe(2);
-    expect(new Set(t3Topics).size).toBe(2);
+    expect(t3Topics.length).toBe(1);
 
     unmount();
+    expect(removeChannel).toHaveBeenCalledTimes(1);
   });
 });

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { ArrowRight, LoaderCircle, MailCheck } from "lucide-react";
 import Field from "../components/forms/Field";
-import { supabase } from "../lib/supabase";
+import { getSupabase, supabaseConfigured } from "../lib/supabase";
 import { email as emailRule } from "../utils/validation";
 
 export default function Login({ mode = "login" }) {
@@ -21,19 +21,32 @@ export default function Login({ mode = "login" }) {
     setError(msg);
     if (msg) return;
     setStatus("sending");
-    const { error: err } = await supabase.auth.signInWithOtp({ email: email.trim(), options: { emailRedirectTo: redirectTo } });
-    if (err) {
-      setError(err.message);
+    try {
+      const supabase = await getSupabase();
+      const { error: err } = await supabase.auth.signInWithOtp({ email: email.trim(), options: { emailRedirectTo: redirectTo } });
+      if (err) {
+        setError(err.message);
+        setStatus("idle");
+      } else setStatus("sent");
+    } catch {
+      setError("We couldn't send the link. Check your connection and try again.");
       setStatus("idle");
-    } else setStatus("sent");
+    }
   };
 
-  const google = () => supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo } });
+  const google = async () => {
+    try {
+      const supabase = await getSupabase();
+      await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo } });
+    } catch {
+      setError("We couldn't reach Google sign-in. Check your connection and try again.");
+    }
+  };
 
   return (
     <section className="container-page flex min-h-[80vh] items-center justify-center pb-24 pt-32">
       <div className="card w-full max-w-md p-8 md:p-10">
-        {!supabase ? (
+        {!supabaseConfigured ? (
           <p role="alert" className="text-sm text-muted">Sign-in isn't configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.</p>
         ) : status === "sent" ? (
           <div role="status" className="text-center">

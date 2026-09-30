@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "../../lib/api";
-import { supabase } from "../../lib/supabase";
+import { getSupabase, supabaseConfigured } from "../../lib/supabase";
 
 const ACTIVE = new Set(["queued", "running"]);
 
@@ -25,7 +25,7 @@ export default function useTaskLive(taskId, initialTask) {
   }, [taskId, initialTask?.status]);
 
   useEffect(() => {
-    if (!active || !supabase) return;
+    if (!active || !supabaseConfigured) return;
     // realtime-js reuses a channel still in its list for the same topic, and removeChannel()
     // is async (the channel stays "leaving" until the server acks). A topic stable across an
     // effect's cleanup + re-run — including useId(), which doesn't change within a mount — can
@@ -33,14 +33,28 @@ export default function useTaskLive(taskId, initialTask) {
     // a quick unmount/remount, or two cards for the same task. Generate a fresh random suffix on
     // every effect run so each subscribe always gets a brand-new topic.
     const topic = `task-${taskId}-${Math.random().toString(36).slice(2, 10)}`;
-    const channel = supabase
-      .channel(topic)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "task_events", filter: `task_id=eq.${taskId}` }, () => refresh())
-      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "tasks", filter: `id=eq.${taskId}` }, () => refresh())
-      .subscribe();
+    // The client loads asynchronously; a run cleaned up before it arrives never subscribes.
+    let cancelled = false;
+    let supabase = null;
+    let channel = null;
+    getSupabase()
+      .then((client) => {
+        if (cancelled || !client) return;
+        supabase = client;
+        channel = client
+          .channel(topic)
+          .on("postgres_changes", { event: "INSERT", schema: "public", table: "task_events", filter: `task_id=eq.${taskId}` }, () => refresh().catch(() => {}))
+          .on("postgres_changes", { event: "UPDATE", schema: "public", table: "tasks", filter: `id=eq.${taskId}` }, () => refresh().catch(() => {}))
+          .subscribe();
+      })
+      .catch(() => {});
     // Safety net if Realtime is unavailable: poll slowly.
     const poll = setInterval(() => refresh().catch(() => {}), 8000);
-    return () => { clearInterval(poll); supabase.removeChannel(channel); };
+    return () => {
+      cancelled = true;
+      clearInterval(poll);
+      if (channel) supabase.removeChannel(channel);
+    };
   }, [active, taskId, refresh]);
 
   return { ...state, refresh, setTask: (task) => setState((s) => ({ ...s, task })) };

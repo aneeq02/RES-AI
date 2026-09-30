@@ -4,13 +4,15 @@ import { FileText, LogOut, Settings as SettingsIcon, Users } from "lucide-react"
 import Logo from "../components/navbar/Logo";
 import CreditsMeter from "./components/CreditsMeter";
 import { useMe } from "../context/MeContext";
-import { supabase } from "../lib/supabase";
+import { getSupabase } from "../lib/supabase";
 
 const NAV = [
   { to: "/app", label: "Team", icon: Users, end: true },
   { to: "/app/deliverables", label: "Deliverables", icon: FileText },
   { to: "/app/settings", label: "Settings", icon: SettingsIcon },
 ];
+
+const signOut = async () => (await getSupabase())?.auth.signOut();
 
 export default function AppShell() {
   const { me } = useMe();
@@ -29,7 +31,7 @@ export default function AppShell() {
             ))}
           </nav>
           <CreditsMeter credits={me?.credits} />
-          <button type="button" onClick={() => supabase?.auth.signOut()} className="grid h-11 w-11 place-items-center rounded-full text-muted hover:bg-white/5 hover:text-white" aria-label="Sign out">
+          <button type="button" onClick={signOut} className="grid h-11 w-11 place-items-center rounded-full text-muted hover:bg-white/5 hover:text-white" aria-label="Sign out">
             <LogOut size={18} aria-hidden="true" />
           </button>
         </div>
