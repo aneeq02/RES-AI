@@ -5,16 +5,32 @@ import Markdown from "./Markdown";
 import TaskCard from "./TaskCard";
 import { api, streamChat } from "../../lib/api";
 
-export default function ChatThread({ threadId, agent, canChat, starter, onActivity }) {
+// Follow new content only while the reader is already at (or near) the bottom.
+const STICK_PX = 80;
+
+/** A short plain-text preview of a markdown reply for the screen-reader announcement. */
+const preview = (md) => md.replace(/[#*_`>|[\]]+/g, " ").replace(/\s+/g, " ").trim().slice(0, 200);
+
+export default function ChatThread({ threadId, agent, canChat, starter, onActivity, lockedPlaceholder = "Choose a plan to start chatting" }) {
   const [data, setData] = useState({ messages: [], tasks: {}, deliverables: {} });
   const [draft, setDraft] = useState("");
   const [streaming, setStreaming] = useState(null); // { user, text } while a reply streams
   const [error, setError] = useState(null);
-  const endRef = useRef(null);
+  const [announcement, setAnnouncement] = useState("");
+  const listRef = useRef(null);
+  const stick = useRef(true);
 
   const load = useCallback(async () => setData(await api(`/threads/${threadId}/messages`)), [threadId]);
   useEffect(() => { load().catch(() => setError("Couldn't load this conversation.")); }, [load]);
-  useEffect(() => { endRef.current?.scrollIntoView({ block: "end" }); }, [data, streaming]);
+  useEffect(() => {
+    const el = listRef.current;
+    if (el && stick.current) el.scrollTop = el.scrollHeight;
+  }, [data, streaming]);
+
+  const onScroll = () => {
+    const el = listRef.current;
+    stick.current = el.scrollHeight - el.scrollTop - el.clientHeight <= STICK_PX;
+  };
 
   const send = async (e) => {
     e?.preventDefault();
@@ -22,19 +38,44 @@ export default function ChatThread({ threadId, agent, canChat, starter, onActivi
     if (!text || streaming) return;
     setDraft("");
     setError(null);
+    setAnnouncement("");
+    stick.current = true; // sending jumps to your own message
     setStreaming({ user: text, text: "" });
+    let received = false;
+    let reply = "";
+    let failed = false;
     try {
       await streamChat(threadId, text, (event, payload) => {
-        if (event === "text") setStreaming((s) => ({ ...s, text: s.text + payload.delta }));
-        if (event === "error") setError(payload.message);
+        received = true;
+        if (event === "text") {
+          reply += payload.delta;
+          setStreaming((s) => ({ ...s, text: s.text + payload.delta }));
+        }
+        if (event === "error") {
+          failed = true;
+          setError(payload.message);
+        }
       });
+      if (!failed) setAnnouncement(reply.trim() ? `${agent.name} replied: ${preview(reply)}` : `${agent.name} replied.`);
     } catch (err) {
-      setError(err.status === 429 ? "You're sending messages quickly. Try again in a bit." : err.status === 402 ? "Choose a plan to chat." : "Message failed to send.");
+      setError(
+        err.status === 429 ? "You're sending messages quickly. Try again in a bit."
+          : err.status === 402 ? "Choose a plan to chat."
+          : received ? "Connection dropped. The reply may still be saving; refresh in a moment."
+          : "Message failed to send.",
+      );
     } finally {
       await load().catch(() => {});
       setStreaming(null);
       onActivity?.();
     }
+  };
+
+  const onKeyDown = (e) => {
+    // Enter confirms an IME composition (e.g. Japanese, Chinese input); it must not send.
+    if (e.key !== "Enter" || e.shiftKey || e.nativeEvent.isComposing || e.keyCode === 229) return;
+    e.preventDefault();
+    send();
   };
 
   const addTask = (task) => setData((d) => ({ ...d, tasks: { ...d.tasks, [task.id]: task } })) || load();
@@ -57,7 +98,7 @@ export default function ChatThread({ threadId, agent, canChat, starter, onActivi
 
   return (
     <div className="flex h-[calc(100vh-11rem)] min-h-[480px] flex-col">
-      <div className="flex-1 space-y-5 overflow-y-auto pr-1" aria-live="polite">
+      <div ref={listRef} onScroll={onScroll} aria-busy={streaming ? "true" : "false"} className="flex-1 space-y-5 overflow-y-auto pr-1">
         {empty && (
           <div className="grid h-full place-items-center text-center">
             <div>
@@ -79,15 +120,16 @@ export default function ChatThread({ threadId, agent, canChat, starter, onActivi
             </div>
           </>
         )}
-        <div ref={endRef} />
       </div>
+      {/* Announces each finished reply once, instead of re-reading the growing stream on every delta. */}
+      <p role="status" className="sr-only">{announcement}</p>
       {error && <p className="field-error" role="alert">{error}</p>}
       <form onSubmit={send} className="mt-4 flex items-end gap-2 rounded-2xl border border-line bg-surface-2 p-2">
         <label htmlFor="chat-input" className="sr-only">Message {agent.name}</label>
         <textarea id="chat-input" rows={1} value={draft} disabled={!canChat} maxLength={4000}
           onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
-          placeholder={canChat ? `Message ${agent.name}…` : "Choose a plan to start chatting"}
+          onKeyDown={onKeyDown}
+          placeholder={canChat ? `Message ${agent.name}…` : lockedPlaceholder}
           className="max-h-40 min-h-11 flex-1 resize-none bg-transparent px-3 py-2.5 text-sm outline-none placeholder:text-subtle" />
         <button type="submit" disabled={!canChat || !draft.trim() || Boolean(streaming)} className="btn-primary h-11 w-11 shrink-0 p-0" aria-label="Send">
           <ArrowUp size={18} aria-hidden="true" />
