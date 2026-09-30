@@ -1,8 +1,8 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type Anthropic from "@anthropic-ai/sdk";
 import { makeTestDb } from "./helpers/db.js";
 import { createApp } from "../src/http/app.js";
-import { grantPeriodCredits } from "../src/credits.js";
+import { creditBalance, grantPeriodCredits } from "../src/credits.js";
 
 let t: Awaited<ReturnType<typeof makeTestDb>>;
 let userId: string;
@@ -29,7 +29,12 @@ beforeEach(async () => {
   userId = await t.createUser("ada@example.com");
   otherId = await t.createUser("eve@example.com");
   enqueued = [];
-  app = createApp({
+  app = makeApp();
+});
+afterEach(async () => { await t.close(); });
+
+function makeApp(over: Partial<Parameters<typeof createApp>[0]> = {}) {
+  return createApp({
     db: t.db,
     verifyToken: async (token) => (token === "ada" ? { id: userId, email: "ada@example.com" } : token === "eve" ? { id: otherId, email: "eve@example.com" } : null),
     chatLlm,
@@ -39,9 +44,9 @@ beforeEach(async () => {
     appUrl: "http://localhost:5173",
     chatModel: "claude-sonnet-5",
     now: () => new Date("2026-09-02T00:00:00Z"),
+    ...over,
   });
-});
-afterEach(async () => { await t.close(); });
+}
 
 const call = (method: string, path: string, token = "ada", body?: unknown) =>
   app.request(path, { method, headers: { authorization: `Bearer ${token}`, "content-type": "application/json" }, body: body ? JSON.stringify(body) : undefined });
@@ -156,5 +161,46 @@ describe("api", () => {
       [thread.thread.id, userId],
     );
     expect((await call("POST", `/threads/${thread.thread.id}/messages`, "ada", { text: "hi" })).status).toBe(429);
+  });
+  it("refunds and fails the task when it can't be queued", async () => {
+    await activate(10);
+    const { taskId } = await proposeViaChat();
+    app = makeApp({ enqueueTask: async () => { throw new Error("pg-boss down"); } });
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      const res = await call("POST", `/tasks/${taskId}/start`, "ada");
+      expect(res.status).toBe(503);
+      expect(await res.json()).toEqual({ error: "enqueue_failed" });
+    } finally {
+      errSpy.mockRestore();
+    }
+    expect(await creditBalance(t.db, userId)).toBe(10);
+    const row = (await t.db.query("select status, error from tasks where id = $1", [taskId])).rows[0];
+    expect(row).toEqual({ status: "failed", error: "Buddy couldn't queue this task. Your credits were refunded." });
+  });
+
+  it("returns a fixed message, not the internal error, when the website draft fails", async () => {
+    app = makeApp({ draftLlm: { create: async () => { throw new Error("401 invalid x-api-key sk-ant-secret"); } } });
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      const res = await call("POST", "/profile/draft-from-website", "ada", { website: "acme.test" });
+      expect(res.status).toBe(422);
+      expect(await res.json()).toEqual({ error: "Buddy couldn't read that website. Fill the profile in by hand." });
+      expect(errSpy).toHaveBeenCalled();
+    } finally {
+      errSpy.mockRestore();
+    }
+  });
+
+  it("rejects a webhook with a bad signature", async () => {
+    const stripe = { webhooks: { constructEvent: () => { throw new Error("No signatures found matching the expected signature"); } } } as any;
+    app = makeApp({ stripe, webhookSecret: "whsec_test" });
+    const res = await app.request("/stripe/webhook", { method: "POST", headers: { "stripe-signature": "t=1,v1=bad" }, body: "{}" });
+    expect(res.status).toBe(400);
+  });
+
+  it("404s the webhook route when no webhook secret is configured", async () => {
+    const res = await app.request("/stripe/webhook", { method: "POST", headers: { "stripe-signature": "t=1,v1=x" }, body: "{}" });
+    expect(res.status).toBe(404);
   });
 });

@@ -5,7 +5,7 @@ import { z } from "zod";
 import type Stripe from "stripe";
 import type { Db } from "../db.js";
 import { agentDto, getAgent, liveAgents } from "../agents/registry.js";
-import { creditBalance, reserveTaskCredits } from "../credits.js";
+import { creditBalance, failTask, reserveTaskCredits } from "../credits.js";
 import { creditPeriod } from "../period.js";
 import { PLANS, isPlanId } from "../plans.js";
 import { sendChatMessage } from "../chat/chat.js";
@@ -126,7 +126,8 @@ export function createApp(deps: AppDeps) {
     try {
       return c.json({ draft: await draftProfileFromWebsite(deps.draftLlm, deps.chatModel, body.data.website) });
     } catch (err) {
-      return c.json({ error: (err as Error).message }, 422);
+      console.error("profile draft failed", err);
+      return c.json({ error: "Buddy couldn't read that website. Fill the profile in by hand." }, 422);
     }
   });
 
@@ -207,7 +208,14 @@ export function createApp(deps: AppDeps) {
     const result = await reserveTaskCredits(db, id);
     if (result === "insufficient") return c.json({ error: "insufficient_credits" }, 402);
     if (result !== "ok") return c.json({ error: "not_proposed" }, 409);
-    await deps.enqueueTask(id);
+    try {
+      await deps.enqueueTask(id);
+    } catch (err) {
+      // Credits are already reserved; hand them back rather than leave the task stuck in 'queued'.
+      console.error(`enqueue failed for task ${id}`, err);
+      await failTask(db, id, "Buddy couldn't queue this task. Your credits were refunded.");
+      return c.json({ error: "enqueue_failed" }, 503);
+    }
     return c.json({ task: taskDto(await ownTask(user.id, id)) });
   });
 
