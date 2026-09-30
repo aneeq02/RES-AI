@@ -80,7 +80,7 @@ export function dbRunnerIO(db: Db): RunnerIO {
          select id from d`,
         [task.id, task.agent_id, d.title, d.body_md, JSON.stringify(d.sources), d.partial, costUsd],
       );
-      if (!rows[0]) throw new TaskError("Buddy took too long and stopped. Your credits were refunded.");
+      if (!rows[0]) throw new TaskError("Buddy took too long and stopped.");
       return rows[0].id;
     },
   };

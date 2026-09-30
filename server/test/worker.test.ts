@@ -82,7 +82,11 @@ describe("processTaskJob", () => {
       },
     };
     expect(await processTaskJob(deps(sweptMidRun), taskId)).toBe("failed");
-    expect((await task()).status).toBe("failed");
+    const row = await task();
+    expect(row.status).toBe("failed");
+    // fail_task is a no-op once the task is already 'failed', so the original sweep error
+    // ('swept') stays in place, unchanged and not duplicated with the TaskError's message.
+    expect(row.error).toBe("swept");
     expect((await t.db.query("select 1 from deliverables where task_id = $1", [taskId])).rows).toHaveLength(0);
     expect((await t.db.query("select 1 from messages where thread_id = $1", [threadId])).rows).toHaveLength(0);
     expect(await creditBalance(t.db, userId)).toBe(10);
