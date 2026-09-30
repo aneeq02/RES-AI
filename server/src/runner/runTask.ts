@@ -93,11 +93,16 @@ export async function runTask(
   let wrappingUp = false;
   let nudged = false;
 
+  // Progress events are best-effort: a failed write must never crash the run or the process.
+  const logEvent = (type: "step" | "search" | "fetch" | "note", text: string) => {
+    deps.io.addEvent(task, type, text).catch((err) => console.error("task event write failed", err));
+  };
+
   const onBlock = (b: Anthropic.Beta.BetaContentBlock) => {
     if (b.type !== "server_tool_use") return;
     const input = (b.input ?? {}) as { query?: string; url?: string };
-    if (b.name === "web_search" && input.query) void deps.io.addEvent(task, "search", `Searching: ${input.query}`.slice(0, 300));
-    if (b.name === "web_fetch" && input.url) void deps.io.addEvent(task, "fetch", `Reading ${input.url}`.slice(0, 300));
+    if (b.name === "web_search" && input.query) logEvent("search", `Searching: ${input.query}`.slice(0, 300));
+    if (b.name === "web_fetch" && input.url) logEvent("fetch", `Reading ${input.url}`.slice(0, 300));
   };
 
   const save = async (d: DeliverableInput) => ({ deliverableId: await deps.io.complete(task, d, meter.usd), costUsd: meter.usd });

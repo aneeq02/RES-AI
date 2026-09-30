@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type Anthropic from "@anthropic-ai/sdk";
 import { buddy } from "../src/agents/buddy.js";
 import { runTask, TaskError, type DeliverableInput, type RunnerIO, type TaskRow } from "../src/runner/runTask.js";
@@ -104,6 +104,33 @@ describe("runTask", () => {
   it("fails with a TaskError when the model refuses", async () => {
     const { llm } = scripted([msg([], "refusal")]);
     await expect(runTask(task, deps(llm, memoryIO().io))).rejects.toBeInstanceOf(TaskError);
+  });
+
+  it("swallows a failing addEvent write for search/fetch progress events and still completes the run", async () => {
+    const { llm } = scripted(
+      [
+        msg([toolUse("log_step", { text: "Searching pricing" })], "tool_use", usage(500, 2)),
+        msg([toolUse("save_deliverable", goodDeliverable)], "tool_use"),
+      ],
+      [[{ type: "server_tool_use", id: "s1", name: "web_search", input: { query: "asana pricing" } }, { type: "server_tool_use", id: "s2", name: "web_fetch", input: { url: "https://asana.com/pricing" } }]],
+    );
+    const saved: { d: DeliverableInput; cost: number }[] = [];
+    const io: RunnerIO = {
+      loadContext: async () => ({ business: null, earlier: [] }),
+      addEvent: async (_t, type) => {
+        if (type === "search" || type === "fetch") throw new Error("db write failed");
+      },
+      complete: async (_t, d, cost) => { saved.push({ d, cost }); return "deliv_1"; },
+    };
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      const out = await runTask(task, deps(llm, io));
+      expect(out.deliverableId).toBe("deliv_1");
+      expect(saved).toHaveLength(1);
+      expect(errorSpy).toHaveBeenCalled();
+    } finally {
+      errorSpy.mockRestore();
+    }
   });
 
   it("fails cleanly (never hangs) if the model will not save even after the wrap-up", async () => {
