@@ -51,11 +51,9 @@ function AgentCard({ m }) {
         </p>
 
         <div className="mt-auto flex items-center justify-between gap-4 pt-6">
-          <p className="text-sm text-subtle">
-            from <span className="font-display text-2xl font-bold text-white">${m.price}</span>/mo
-          </p>
-          <Link to="/checkout" state={{ agent: m.id }} className="btn-light min-h-11 px-6 py-2.5 text-xs group-hover:bg-brand group-hover:text-white">
-            Hire {m.name} <ArrowRight size={16} aria-hidden="true" />
+          <p className="text-sm text-subtle">Included in every plan</p>
+          <Link to={`/app/agents/${m.id}`} className="btn-light min-h-11 px-6 py-2.5 text-xs group-hover:bg-brand group-hover:text-white">
+            Start with {m.name} <ArrowRight size={16} aria-hidden="true" />
           </Link>
         </div>
       </div>

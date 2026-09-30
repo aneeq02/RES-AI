@@ -1,7 +1,6 @@
 // Every plan unlocks the full team; longer commitments lower the monthly price.
 export const PLAN_FEATURES = [
   "All 12 AI specialists",
-  "Unlimited tasks & prompts",
   "Brand voice training",
   "Gmail, Slack, Notion & HubSpot integrations",
   "Priority email support",
@@ -40,6 +39,8 @@ export const plans = [
 ];
 
 export const getPlan = (id) => plans.find((p) => p.id === id);
+
+export const creditsLine = (plan) => `${plan.credits} task credits / month + unlimited chat`;
 
 export const formatPrice = (n) =>
   n.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: n % 1 ? 2 : 0 });

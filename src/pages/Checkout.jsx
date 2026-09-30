@@ -1,20 +1,12 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, CircleCheck, Lock, LoaderCircle, ShieldCheck } from "lucide-react";
-import Field from "../components/forms/Field";
+import { Link, Navigate, useLocation, useSearchParams } from "react-router-dom";
+import { ArrowLeft, ArrowRight, Check, Lock, LoaderCircle, ShieldCheck } from "lucide-react";
 import AgentAvatar from "../components/agents/AgentAvatar";
-import { plans, getPlan, formatPrice, PLAN_FEATURES } from "../data/plans";
+import { plans, getPlan, formatPrice, PLAN_FEATURES, creditsLine } from "../data/plans";
 import { getMember } from "../data/members";
-import { validate, required, email as emailRule } from "../utils/validation";
-
-const RULES = {
-  firstName: required("First name"),
-  lastName: required("Last name"),
-  email: emailRule,
-  company: required("Company name"),
-  terms: (v) => (v ? undefined : "Please accept the terms to continue."),
-};
+import { useAuth } from "../context/AuthContext";
+import { hasActivePlan, useMe } from "../context/MeContext";
+import { api } from "../lib/api";
 
 function PlanPicker({ value, onChange }) {
   return (
@@ -94,7 +86,7 @@ function Summary({ plan, agent }) {
       </dl>
 
       <ul className="mt-6 space-y-2 border-t border-line pt-6">
-        {PLAN_FEATURES.map((f) => (
+        {[creditsLine(plan), ...PLAN_FEATURES].map((f) => (
           <li key={f} className="flex items-start gap-2 text-sm text-zinc-300">
             <Check size={15} className="mt-0.5 shrink-0 text-brand-ink" aria-hidden="true" /> {f}
           </li>
@@ -108,154 +100,74 @@ function Summary({ plan, agent }) {
   );
 }
 
-function Success({ values, plan }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="card mx-auto max-w-xl p-8 text-center md:p-12"
-      role="status"
-    >
-      <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-400/15 text-emerald-300">
-        <CircleCheck size={32} aria-hidden="true" />
-      </div>
-      <h1 className="mt-6 text-3xl font-bold tracking-tight md:text-4xl">You're in, {values.firstName}!</h1>
-      <p className="mt-4 text-muted">
-        We've reserved the <span className="font-bold text-white">{plan.name}</span> for {values.company}. A secure payment link and your workspace
-        invite are on their way to <span className="font-bold text-white">{values.email}</span>.
-      </p>
-      <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-        <Link to="/agents" className="btn-primary">
-          Meet your team <ArrowRight size={18} aria-hidden="true" />
-        </Link>
-        <Link to="/" className="btn-secondary">
-          Back home
-        </Link>
-      </div>
-    </motion.div>
-  );
-}
-
 export default function Checkout() {
   const { state } = useLocation();
-  const [planId, setPlanId] = useState(getPlan(state?.plan) ? state.plan : "12-month");
-  const agent = getMember(state?.agent);
+  const [params] = useSearchParams();
+  const initial = getPlan(params.get("plan")) ? params.get("plan") : getPlan(state?.plan) ? state.plan : "12-month";
+  const [planId, setPlanId] = useState(initial);
   const plan = getPlan(planId);
+  const agent = getMember(state?.agent);
+  const { session, loading } = useAuth();
+  const { me } = useMe();
+  const [terms, setTerms] = useState(false);
+  const [error, setError] = useState(null);
+  const [status, setStatus] = useState("idle"); // idle | redirecting
+  const here = `/checkout?plan=${planId}`;
 
-  const [values, setValues] = useState({ firstName: "", lastName: "", email: state?.email || "", company: "", terms: false });
-  const [errors, setErrors] = useState({});
-  const [status, setStatus] = useState("idle"); // idle | submitting | done
+  if (!loading && !session) return <Navigate to={`/signup?next=${encodeURIComponent(here)}`} replace />;
+  if (me && !me.profile.onboardedAt) return <Navigate to={`/app/onboarding?next=${encodeURIComponent(here)}`} replace />;
 
-  const set = (field) => (e) => {
-    const v = e.target.type === "checkbox" ? e.target.checked : e.target.value;
-    setValues((prev) => ({ ...prev, [field]: v }));
-    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
-  };
-
-  const onSubmit = (e) => {
+  const pay = async (e) => {
     e.preventDefault();
-    const found = validate(values, RULES);
-    setErrors(found);
-    const first = Object.keys(found)[0];
-    if (first) {
-      document.querySelector(`[name="${first}"]`)?.focus();
-      return;
+    if (!terms) { setError("Please accept the terms to continue."); return; }
+    setStatus("redirecting");
+    setError(null);
+    try {
+      const { url } = await api("/billing/checkout", { method: "POST", body: { planId } });
+      window.location.assign(url);
+    } catch (err) {
+      setStatus("idle");
+      setError(err.status === 409 ? "You already have an active plan." : "We couldn't start checkout. Please try again.");
     }
-    setStatus("submitting");
-    // TODO: replace with a real checkout session (e.g. Stripe) once the backend exists.
-    setTimeout(() => setStatus("done"), 900);
   };
 
   return (
-    <>
-      <section className="container-page pb-24 pt-32 md:pt-40">
-        <AnimatePresence mode="wait">
-          {status === "done" ? (
-            <Success key="done" values={values} plan={plan} />
-          ) : (
-            <motion.div key="form" exit={{ opacity: 0 }}>
-              <Link to="/pricing" className="inline-flex min-h-11 items-center gap-2 text-sm text-muted transition hover:text-white">
-                <ArrowLeft size={16} aria-hidden="true" /> Back to pricing
-              </Link>
-              <h1 className="mt-4 text-4xl font-bold tracking-tight md:text-5xl">Complete your order</h1>
-              <p className="mt-3 text-muted">Takes about a minute. You won't be charged until you confirm payment.</p>
+    <section className="container-page pb-24 pt-32 md:pt-40">
+      <Link to="/pricing" className="inline-flex min-h-11 items-center gap-2 text-sm text-muted transition hover:text-white">
+        <ArrowLeft size={16} aria-hidden="true" /> Back to pricing
+      </Link>
+      <h1 className="mt-4 text-4xl font-bold tracking-tight md:text-5xl">Complete your order</h1>
+      {params.get("canceled") && <p role="status" className="mt-3 text-muted">Checkout was cancelled. You haven't been charged.</p>}
 
-              <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_380px]">
-                <form onSubmit={onSubmit} noValidate className="card space-y-7 p-6 md:p-10">
-                  <PlanPicker value={planId} onChange={setPlanId} />
-
-                  <div className="grid gap-6 border-t border-line pt-7 sm:grid-cols-2">
-                    <Field label="First name" name="firstName" autoComplete="given-name" value={values.firstName} onChange={set("firstName")} error={errors.firstName} />
-                    <Field label="Last name" name="lastName" autoComplete="family-name" value={values.lastName} onChange={set("lastName")} error={errors.lastName} />
-                  </div>
-                  <Field
-                    label="Work email"
-                    name="email"
-                    type="email"
-                    inputMode="email"
-                    autoComplete="email"
-                    placeholder="you@company.com"
-                    value={values.email}
-                    onChange={set("email")}
-                    error={errors.email}
-                  />
-                  <Field
-                    label="Company name"
-                    name="company"
-                    autoComplete="organization"
-                    value={values.company}
-                    onChange={set("company")}
-                    error={errors.company}
-                  />
-
-                  <div className="rounded-2xl border border-line bg-black/40 p-5">
-                    <p className="flex items-center gap-2 text-sm font-bold">
-                      <Lock size={16} className="text-brand-ink" aria-hidden="true" /> Secure payment
-                    </p>
-                    <p className="mt-1 text-sm text-muted">
-                      After you confirm, we email a secure payment link from our payment provider. We never store card details on this site.
-                    </p>
-                  </div>
-
-                  <div>
-                    <label className="flex cursor-pointer items-start gap-3 text-sm text-zinc-300">
-                      <input
-                        type="checkbox"
-                        name="terms"
-                        checked={values.terms}
-                        onChange={set("terms")}
-                        aria-invalid={errors.terms ? "true" : undefined}
-                        aria-describedby={errors.terms ? "terms-error" : undefined}
-                        className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer accent-brand"
-                      />
-                      I agree to the terms of service and understand my plan renews automatically unless cancelled.
-                    </label>
-                    {errors.terms && (
-                      <p id="terms-error" className="field-error" role="alert">
-                        {errors.terms}
-                      </p>
-                    )}
-                  </div>
-
-                  <button type="submit" disabled={status === "submitting"} className="btn-primary btn-lg w-full">
-                    {status === "submitting" ? (
-                      <>
-                        <LoaderCircle size={18} className="animate-spin" aria-hidden="true" /> Confirming…
-                      </>
-                    ) : (
-                      <>
-                        Confirm order · {formatPrice(plan.price * plan.months)}
-                      </>
-                    )}
-                  </button>
-                </form>
-
-                <Summary plan={plan} agent={agent} />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </section>
-    </>
+      {hasActivePlan(me) ? (
+        <div className="card mt-10 max-w-xl p-8">
+          <p className="font-bold">You already have an active plan.</p>
+          <Link to="/app" className="btn-primary mt-6">Go to your team <ArrowRight size={18} aria-hidden="true" /></Link>
+        </div>
+      ) : (
+        <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_380px]">
+          <form onSubmit={pay} noValidate className="card space-y-7 p-6 md:p-10">
+            <PlanPicker value={planId} onChange={setPlanId} />
+            <div className="rounded-2xl border border-line bg-black/40 p-5">
+              <p className="flex items-center gap-2 text-sm font-bold"><Lock size={16} className="text-brand-ink" aria-hidden="true" /> Secure payment</p>
+              <p className="mt-1 text-sm text-muted">You'll pay on Stripe's secure checkout page. We never see or store card details.</p>
+            </div>
+            <div>
+              <label className="flex cursor-pointer items-start gap-3 text-sm text-zinc-300">
+                <input type="checkbox" checked={terms} onChange={(e) => { setTerms(e.target.checked); setError(null); }}
+                  aria-invalid={error && !terms ? "true" : undefined} aria-describedby={error ? "checkout-error" : undefined}
+                  className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer accent-brand" />
+                I agree to the terms of service and understand my plan renews automatically unless cancelled.
+              </label>
+              {error && <p id="checkout-error" className="field-error" role="alert">{error}</p>}
+            </div>
+            <button type="submit" disabled={status === "redirecting" || !me} className="btn-primary btn-lg w-full">
+              {status === "redirecting" ? (<><LoaderCircle size={18} className="animate-spin" aria-hidden="true" /> Opening secure checkout…</>) : (<>Continue to payment · {formatPrice(plan.price * plan.months)}</>)}
+            </button>
+          </form>
+          <Summary plan={plan} agent={agent} />
+        </div>
+      )}
+    </section>
   );
 }

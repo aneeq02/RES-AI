@@ -72,9 +72,6 @@ export default function AgentsCarousel({
             <div className="flex flex-1 flex-col p-6">
               <div className="flex items-baseline justify-between gap-3">
                 <h3 className="text-2xl font-bold tracking-tight">{m.name}</h3>
-                <span className="text-sm text-subtle">
-                  from <span className="font-bold text-white">${m.price}</span>/mo
-                </span>
               </div>
               <p className="mt-1 text-sm font-bold uppercase tracking-[0.12em] text-brand-ink">{m.role}</p>
               <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-zinc-300">{m.description}</p>

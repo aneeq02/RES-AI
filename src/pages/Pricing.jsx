@@ -5,7 +5,7 @@ import { ArrowRight, Check, ShieldCheck } from "lucide-react";
 import SectionHeading from "../components/ui/SectionHeading";
 import FaqList from "../components/ui/FaqList";
 import { inViewStagger, itemStagger } from "../animations/variants";
-import { PLAN_FEATURES, plans, formatPrice } from "../data/plans";
+import { PLAN_FEATURES, plans, formatPrice, creditsLine } from "../data/plans";
 import { FAQ_GROUPS } from "../data/faqs";
 
 const AGENT_TRIO = ["/agents/cassie.webp", "/agents/soshie.webp", "/agents/dexter.webp"];
@@ -64,8 +64,7 @@ function PlanCard({ plan }) {
         </p>
 
         <Link
-          to="/checkout"
-          state={{ plan: plan.id }}
+          to={`/checkout?plan=${plan.id}`}
           className={`${popular ? "btn-primary" : "btn-secondary"} mt-7 w-full`}
           aria-label={`Get res — ${plan.name}`}
         >
@@ -73,7 +72,7 @@ function PlanCard({ plan }) {
         </Link>
 
         <ul className="mt-7 space-y-3">
-          {[...PLAN_FEATURES, ...(plan.extras || [])].map((f) => (
+          {[creditsLine(plan), ...PLAN_FEATURES, ...(plan.extras || [])].map((f) => (
             <li key={f} className="flex items-start gap-2.5 text-sm text-zinc-200">
               <Check size={16} className="mt-0.5 shrink-0 text-brand-ink" aria-hidden="true" /> {f}
             </li>
