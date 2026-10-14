@@ -33,7 +33,7 @@ export default function GetStartedModal({ isOpen, onClose }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-canvas/70 backdrop-blur-sm"
             aria-hidden="true"
           />
           <motion.div
@@ -50,7 +50,7 @@ export default function GetStartedModal({ isOpen, onClose }) {
             <button
               type="button"
               onClick={onClose}
-              className="absolute right-5 top-5 grid h-11 w-11 place-items-center rounded-full text-muted transition hover:bg-white/5 hover:text-white"
+              className="absolute right-5 top-5 grid h-11 w-11 place-items-center rounded-full text-muted transition hover:bg-ink/5 hover:text-ink"
               aria-label="Close"
             >
               <X size={20} aria-hidden="true" />
@@ -64,7 +64,7 @@ export default function GetStartedModal({ isOpen, onClose }) {
 
             <ul className="mt-6 space-y-2">
               {PERKS.map((p) => (
-                <li key={p} className="flex items-center gap-2 text-sm text-zinc-200">
+                <li key={p} className="flex items-center gap-2 text-sm text-ink-soft">
                   <Check size={16} className="text-brand-ink" aria-hidden="true" /> {p}
                 </li>
               ))}

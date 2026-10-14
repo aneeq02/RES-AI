@@ -11,7 +11,7 @@ function Column({ title, links }) {
       <ul className="space-y-1">
         {links.map((l) => (
           <li key={l.to}>
-            <Link to={l.to} className="inline-flex min-h-9 items-center text-sm text-zinc-300 transition hover:text-white">
+            <Link to={l.to} className="inline-flex min-h-9 items-center text-sm text-ink-soft transition hover:text-ink">
               {l.label}
             </Link>
           </li>
@@ -39,12 +39,12 @@ export default function Footer() {
           <h2 className="mb-4 font-sans text-xs font-bold uppercase tracking-[0.16em] text-subtle">Get in touch</h2>
           <ul className="space-y-1 text-sm">
             <li>
-              <a href={`mailto:${CONTACT.email}`} className="inline-flex min-h-9 items-center gap-2 text-zinc-300 transition hover:text-white">
+              <a href={`mailto:${CONTACT.email}`} className="inline-flex min-h-9 items-center gap-2 text-ink-soft transition hover:text-ink">
                 <Mail size={16} aria-hidden="true" className="text-brand-ink" /> {CONTACT.email}
               </a>
             </li>
             <li>
-              <a href={`tel:${CONTACT.phone.replace(/[^+\d]/g, "")}`} className="inline-flex min-h-9 items-center gap-2 text-zinc-300 transition hover:text-white">
+              <a href={`tel:${CONTACT.phone.replace(/[^+\d]/g, "")}`} className="inline-flex min-h-9 items-center gap-2 text-ink-soft transition hover:text-ink">
                 <Phone size={16} aria-hidden="true" className="text-brand-ink" /> {CONTACT.phone}
               </a>
             </li>

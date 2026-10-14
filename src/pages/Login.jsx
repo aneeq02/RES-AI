@@ -50,9 +50,9 @@ export default function Login({ mode = "login" }) {
           <p role="alert" className="text-sm text-muted">Sign-in isn't configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.</p>
         ) : status === "sent" ? (
           <div role="status" className="text-center">
-            <MailCheck size={36} className="mx-auto text-emerald-300" aria-hidden="true" />
+            <MailCheck size={36} className="mx-auto text-ok" aria-hidden="true" />
             <h1 className="mt-4 text-2xl font-bold tracking-tight">Check your inbox</h1>
-            <p className="mt-2 text-sm text-muted">We sent a sign-in link to <span className="font-bold text-white">{email.trim()}</span>. It expires in an hour.</p>
+            <p className="mt-2 text-sm text-muted">We sent a sign-in link to <span className="font-bold text-ink">{email.trim()}</span>. It expires in an hour.</p>
           </div>
         ) : (
           <>
@@ -72,7 +72,7 @@ export default function Login({ mode = "login" }) {
             </form>
             <p className="mt-6 text-center text-sm text-muted">
               {isSignup ? "Already have an account? " : "New to res? "}
-              <Link to={`${isSignup ? "/login" : "/signup"}?next=${encodeURIComponent(next)}`} className="font-bold text-white underline-offset-4 hover:underline">
+              <Link to={`${isSignup ? "/login" : "/signup"}?next=${encodeURIComponent(next)}`} className="font-bold text-ink underline-offset-4 hover:underline">
                 {isSignup ? "Sign in" : "Create an account"}
               </Link>
             </p>

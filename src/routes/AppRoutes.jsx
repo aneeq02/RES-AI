@@ -26,7 +26,7 @@ export default function AppRoutes() {
       <Route
         path="/app/*"
         element={
-          <Suspense fallback={<div className="min-h-screen bg-black" />}>
+          <Suspense fallback={<div className="min-h-screen bg-canvas" />}>
             <AppArea />
           </Suspense>
         }

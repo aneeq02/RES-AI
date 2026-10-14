@@ -16,7 +16,7 @@ function FaqItem({ q, a, open, onToggle }) {
         >
           {q}
           <span
-            className={`grid h-9 w-9 shrink-0 place-items-center rounded-full border transition duration-300 ${open ? "rotate-45 border-brand bg-brand text-white" : "border-line text-zinc-300"}`}
+            className={`grid h-9 w-9 shrink-0 place-items-center rounded-full border transition duration-300 ${open ? "rotate-45 border-brand bg-brand text-on-brand" : "border-line text-ink-soft"}`}
             aria-hidden="true"
           >
             <Plus size={18} />
@@ -33,7 +33,7 @@ function FaqItem({ q, a, open, onToggle }) {
         className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out ${open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
       >
         <div className="overflow-hidden">
-          <p className="px-6 pb-6 leading-relaxed text-zinc-300">{a}</p>
+          <p className="px-6 pb-6 leading-relaxed text-ink-soft">{a}</p>
         </div>
       </div>
     </li>

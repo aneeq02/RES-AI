@@ -78,7 +78,7 @@ export default function AgentWorkspace() {
         {needsPayment && <PaymentIssueNotice className="mb-4" />}
         {!planActive && !needsPayment && (
           <p className="mb-4 rounded-2xl border border-line bg-surface-2 px-4 py-3 text-sm text-muted">
-            <Link to="/checkout" className="font-bold text-white underline">Choose a plan</Link> to chat with {member.name} and run tasks.
+            <Link to="/checkout" className="font-bold text-ink underline">Choose a plan</Link> to chat with {member.name} and run tasks.
           </p>
         )}
         {activeId && <ChatThread key={activeId} threadId={activeId} agent={member} canChat={planActive} lockedPlaceholder={needsPayment ? "Update your payment method to keep chatting" : undefined} starter={member.prompt} onActivity={loadThreads} />}

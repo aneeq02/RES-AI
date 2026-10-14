@@ -13,7 +13,7 @@ import Deliverables from "./pages/Deliverables";
 import DeliverableView from "./pages/DeliverableView";
 
 function Center({ children }) {
-  return <div className="grid min-h-screen place-items-center bg-black p-6 text-center text-muted" role="status">{children}</div>;
+  return <div className="grid min-h-screen place-items-center bg-canvas p-6 text-center text-muted" role="status">{children}</div>;
 }
 
 export default function AppArea() {

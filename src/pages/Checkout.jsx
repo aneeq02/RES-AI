@@ -24,7 +24,7 @@ function PlanPicker({ value, onChange }) {
               <label
                 key={p.id}
                 className={`relative flex cursor-pointer flex-col rounded-2xl border p-4 transition has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-ink ${
-                  checked ? "border-brand bg-brand/10" : "border-line bg-black/40 hover:border-line-strong"
+                  checked ? "border-brand bg-brand/10" : "border-line bg-canvas/40 hover:border-line-strong"
                 }`}
               >
                 <input type="radio" name="plan" value={p.id} checked={checked} onChange={() => onChange(p.id)} className="sr-only" />
@@ -57,7 +57,7 @@ function Summary({ plan, agent }) {
       <h2 className="font-sans text-xs font-bold uppercase tracking-[0.16em] text-subtle">Order summary</h2>
 
       {agent && (
-        <div className="mt-5 flex items-center gap-4 rounded-2xl border border-line bg-black/40 p-3">
+        <div className="mt-5 flex items-center gap-4 rounded-2xl border border-line bg-canvas/40 p-3">
           <AgentAvatar member={agent} className="h-16 w-14 shrink-0 rounded-xl" />
           <div className="text-sm">
             <p className="font-bold">Starting with {agent.name}</p>
@@ -77,7 +77,7 @@ function Summary({ plan, agent }) {
           <dt className="text-muted">Regular price</dt>
           <dd className="text-subtle line-through">{formatPrice(plan.listPrice * plan.months)}</dd>
         </div>
-        <div className="flex justify-between text-emerald-300">
+        <div className="flex justify-between text-ok">
           <dt>You save</dt>
           <dd>{formatPrice((plan.listPrice - plan.price) * plan.months)}</dd>
         </div>
@@ -89,14 +89,14 @@ function Summary({ plan, agent }) {
 
       <ul className="mt-6 space-y-2 border-t border-line pt-6">
         {[creditsLine(plan), ...PLAN_FEATURES].map((f) => (
-          <li key={f} className="flex items-start gap-2 text-sm text-zinc-300">
+          <li key={f} className="flex items-start gap-2 text-sm text-ink-soft">
             <Check size={15} className="mt-0.5 shrink-0 text-brand-ink" aria-hidden="true" /> {f}
           </li>
         ))}
       </ul>
 
       <p className="mt-6 flex items-center gap-2 text-xs text-subtle">
-        <ShieldCheck size={16} className="text-emerald-400" aria-hidden="true" /> 14-day money-back guarantee
+        <ShieldCheck size={16} className="text-ok" aria-hidden="true" /> 14-day money-back guarantee
       </p>
     </aside>
   );
@@ -145,7 +145,7 @@ export default function Checkout() {
 
   return (
     <section className="container-page pb-24 pt-32 md:pt-40">
-      <Link to="/pricing" className="inline-flex min-h-11 items-center gap-2 text-sm text-muted transition hover:text-white">
+      <Link to="/pricing" className="inline-flex min-h-11 items-center gap-2 text-sm text-muted transition hover:text-ink">
         <ArrowLeft size={16} aria-hidden="true" /> Back to pricing
       </Link>
       <h1 className="mt-4 text-4xl font-bold tracking-tight md:text-5xl">Complete your order</h1>
@@ -170,12 +170,12 @@ export default function Checkout() {
         <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_380px]">
           <form onSubmit={pay} noValidate className="card space-y-7 p-6 md:p-10">
             <PlanPicker value={planId} onChange={setPlanId} />
-            <div className="rounded-2xl border border-line bg-black/40 p-5">
+            <div className="rounded-2xl border border-line bg-canvas/40 p-5">
               <p className="flex items-center gap-2 text-sm font-bold"><Lock size={16} className="text-brand-ink" aria-hidden="true" /> Secure payment</p>
               <p className="mt-1 text-sm text-muted">You'll pay on Stripe's secure checkout page. We never see or store card details.</p>
             </div>
             <div>
-              <label className="flex cursor-pointer items-start gap-3 text-sm text-zinc-300">
+              <label className="flex cursor-pointer items-start gap-3 text-sm text-ink-soft">
                 <input type="checkbox" checked={terms} onChange={(e) => { setTerms(e.target.checked); setError(null); }}
                   aria-invalid={error && !terms ? "true" : undefined} aria-describedby={error ? "checkout-error" : undefined}
                   className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer accent-brand" />

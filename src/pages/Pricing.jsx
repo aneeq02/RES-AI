@@ -34,7 +34,7 @@ function PlanCard({ plan }) {
       }`}
     >
       {popular && (
-        <span className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-brand px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-white">
+        <span className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-brand px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-on-brand">
           Most popular
         </span>
       )}
@@ -44,7 +44,7 @@ function PlanCard({ plan }) {
       <div className="mt-6 border-t border-line pt-6">
         <div className="flex items-center justify-between gap-3">
           <h2 className="font-sans text-lg font-bold">{plan.name}</h2>
-          <span className={`rounded-lg px-2.5 py-1 text-xs font-bold ${popular ? "bg-brand/20 text-brand-ink" : "bg-white/5 text-zinc-300"}`}>
+          <span className={`rounded-lg px-2.5 py-1 text-xs font-bold ${popular ? "bg-brand/20 text-brand-ink" : "bg-ink/5 text-ink-soft"}`}>
             Save {plan.save}%
           </span>
         </div>
@@ -73,7 +73,7 @@ function PlanCard({ plan }) {
 
         <ul className="mt-7 space-y-3">
           {[creditsLine(plan), ...PLAN_FEATURES, ...(plan.extras || [])].map((f) => (
-            <li key={f} className="flex items-start gap-2.5 text-sm text-zinc-200">
+            <li key={f} className="flex items-start gap-2.5 text-sm text-ink-soft">
               <Check size={16} className="mt-0.5 shrink-0 text-brand-ink" aria-hidden="true" /> {f}
             </li>
           ))}
@@ -98,7 +98,7 @@ export default function Pricing() {
         </motion.ul>
 
         <p className="mt-12 flex items-center justify-center gap-2 text-center text-sm text-muted">
-          <ShieldCheck size={18} className="text-emerald-400" aria-hidden="true" />
+          <ShieldCheck size={18} className="text-ok" aria-hidden="true" />
           14-day money-back guarantee on every plan. Cancel anytime.
         </p>
       </section>
@@ -109,7 +109,7 @@ export default function Pricing() {
           <FaqList items={FAQ_GROUPS.find((g) => g.title === "Plans & billing").items} className="mt-12" />
           <p className="mt-10 text-center text-muted">
             Still unsure?{" "}
-            <Link to="/contact" className="font-bold text-white underline decoration-brand-ink underline-offset-4 hover:text-brand-ink">
+            <Link to="/contact" className="font-bold text-ink underline decoration-brand-ink underline-offset-4 hover:text-brand-ink">
               Talk to our team
             </Link>
           </p>

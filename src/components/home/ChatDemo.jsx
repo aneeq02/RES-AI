@@ -28,7 +28,7 @@ function TypingDots() {
   return (
     <span className="inline-flex items-center gap-1 py-1" aria-label="typing">
       {[0, 1, 2].map((i) => (
-        <span key={i} className="h-1.5 w-1.5 animate-blink rounded-full bg-zinc-300" style={{ animationDelay: `${i * 0.18}s` }} />
+        <span key={i} className="h-1.5 w-1.5 animate-blink rounded-full bg-ink-soft" style={{ animationDelay: `${i * 0.18}s` }} />
       ))}
     </span>
   );
@@ -41,14 +41,14 @@ function AgentMessage({ msg, streamed, done }) {
       <AgentAvatar member={agent} className="h-10 w-10 shrink-0 rounded-full border border-line" imgClassName="object-top scale-150 translate-y-3" />
       <div className="min-w-0 flex-1">
         <p className="mb-1 text-xs font-bold text-brand-ink">{agent.name}</p>
-        <div className="rounded-2xl rounded-tl-md border border-line bg-surface-3 px-4 py-3 text-sm leading-relaxed text-zinc-100">
+        <div className="rounded-2xl rounded-tl-md border border-line bg-surface-3 px-4 py-3 text-sm leading-relaxed text-ink-soft">
           <span aria-hidden="true">{streamed === 0 ? <TypingDots /> : msg.text.slice(0, streamed)}</span>
           <span className="sr-only">{msg.text}</span>
         </div>
         {done && msg.tasks && (
           <ul className="mt-2 flex flex-wrap gap-2">
             {msg.tasks.map((t) => (
-              <li key={t} className="inline-flex items-center gap-1 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2.5 py-1 text-xs text-emerald-300">
+              <li key={t} className="inline-flex items-center gap-1 rounded-full border border-emerald-400/20 bg-ok/10 px-2.5 py-1 text-xs text-ok">
                 <Check size={12} aria-hidden="true" /> {t}
               </li>
             ))}
@@ -95,8 +95,8 @@ export default function ChatDemo() {
       <div className="mb-5 flex items-center justify-between border-b border-line pb-4">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2.5 w-2.5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-ok opacity-60" />
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-ok" />
           </span>
           <span className="text-sm font-bold">Your team is online</span>
         </div>
@@ -107,7 +107,7 @@ export default function ChatDemo() {
       <div className="flex min-h-[420px] flex-col gap-5 sm:min-h-[380px]">
         {visible.map((msg, i) =>
           msg.from === "user" ? (
-            <div key={i} className="ml-auto max-w-[85%] rounded-2xl rounded-tr-md bg-brand px-4 py-3 text-sm font-medium text-white">
+            <div key={i} className="ml-auto max-w-[85%] rounded-2xl rounded-tr-md bg-brand px-4 py-3 text-sm font-medium text-on-brand">
               {msg.text}
             </div>
           ) : (
@@ -121,7 +121,7 @@ export default function ChatDemo() {
         )}
       </div>
 
-      <div className="mt-5 flex items-center gap-3 rounded-2xl border border-line bg-black/40 px-4 py-3 text-sm text-subtle">
+      <div className="mt-5 flex items-center gap-3 rounded-2xl border border-line bg-canvas/40 px-4 py-3 text-sm text-subtle">
         <span className="flex-1 truncate">Ask your team anything…</span>
         <CornerDownLeft size={16} aria-hidden="true" />
       </div>

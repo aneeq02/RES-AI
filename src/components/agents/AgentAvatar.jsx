@@ -51,8 +51,8 @@ export default function AgentAvatar({ member, className = "", imgClassName = "",
         />
       ) : (
         <div className="relative grid h-full w-full place-items-center">
-          <div className="grid h-24 w-24 place-items-center rounded-[1.75rem] border border-white/15 bg-black/40 backdrop-blur-sm">
-            <AgentIcon name={member.icon} size={40} strokeWidth={1.6} className="text-white" />
+          <div className="grid h-24 w-24 place-items-center rounded-[1.75rem] border border-ink/15 bg-canvas/40 backdrop-blur-sm">
+            <AgentIcon name={member.icon} size={40} strokeWidth={1.6} className="text-ink" />
           </div>
           <span className="sr-only">{`${member.name}, ${member.role}`}</span>
         </div>

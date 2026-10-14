@@ -4,11 +4,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Menu, X } from "lucide-react";
 import Logo from "./Logo";
 import MobileMenu from "./MobileMenu";
+import ThemeToggle from "./ThemeToggle";
 import { NAV_LINKS, SERVICE_LINKS } from "../../data/nav";
 import { useGetStarted } from "../../context/GetStartedContext";
 
 const linkClass = ({ isActive }) =>
-  `relative py-2 transition-colors duration-200 hover:text-white ${isActive ? "text-white" : "text-muted"}`;
+  `relative py-2 transition-colors duration-200 hover:text-ink ${isActive ? "text-ink" : "text-muted"}`;
 
 function ServicesMenu() {
   const [open, setOpen] = useState(false);
@@ -54,7 +55,7 @@ function ServicesMenu() {
         aria-expanded={open}
         aria-controls="services-menu"
         onClick={() => setOpen((v) => !v)}
-        className={`flex items-center gap-1 py-2 uppercase tracking-[0.14em] transition-colors hover:text-white ${isActive ? "text-white" : "text-muted"}`}
+        className={`flex items-center gap-1 py-2 tracking-tight transition-colors hover:text-ink ${isActive ? "text-ink" : "text-muted"}`}
       >
         Services
         <ChevronDown size={14} aria-hidden="true" className={`transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
@@ -70,20 +71,20 @@ function ServicesMenu() {
             transition={{ duration: 0.18 }}
             className="absolute left-1/2 top-full w-80 -translate-x-1/2 pt-3"
           >
-            <div className="rounded-3xl border border-line bg-surface-2/95 p-2 shadow-2xl shadow-black/60 backdrop-blur-xl">
+            <div className="rounded-3xl border border-line bg-surface-2/95 p-2 shadow-2xl shadow-black/40 backdrop-blur-xl">
               {SERVICE_LINKS.map((l) => (
                 <Link
                   key={l.to}
                   to={l.to}
-                  className="block rounded-2xl px-4 py-3 normal-case tracking-normal transition hover:bg-white/5 focus-visible:bg-white/5"
+                  className="block rounded-2xl px-4 py-3 normal-case tracking-normal transition hover:bg-ink/5 focus-visible:bg-ink/5"
                 >
-                  <span className="block text-sm font-bold text-white">{l.label}</span>
+                  <span className="block text-sm font-bold text-ink">{l.label}</span>
                   <span className="block text-sm font-normal text-muted">{l.desc}</span>
                 </Link>
               ))}
               <Link
                 to="/services"
-                className="mt-1 block rounded-2xl border-t border-line px-4 py-3 text-xs text-brand-ink transition hover:bg-white/5"
+                className="mt-1 block rounded-2xl border-t border-line px-4 py-3 text-xs text-brand-ink transition hover:bg-ink/5"
               >
                 View all services →
               </Link>
@@ -120,7 +121,7 @@ export default function Navbar() {
     <>
       <header
         className={`fixed inset-x-0 top-0 z-[9999] transition-[background-color,border-color,backdrop-filter] duration-300 ${
-          solid ? "border-b border-line bg-black/80 backdrop-blur-xl" : "border-b border-transparent bg-transparent"
+          solid ? "border-b border-line bg-canvas/70 backdrop-blur-xl" : "border-b border-transparent bg-transparent"
         }`}
       >
         <nav aria-label="Main" className="container-page flex h-18 items-center justify-between md:h-20">
@@ -128,7 +129,7 @@ export default function Navbar() {
             <Logo />
           </Link>
 
-          <div className="hidden items-center gap-8 text-xs font-bold uppercase tracking-[0.14em] lg:flex">
+          <div className="hidden items-center gap-8 text-sm font-medium lg:flex">
             <ServicesMenu />
             {NAV_LINKS.map((l) => (
               <NavLink key={l.to} to={l.to} className={linkClass}>
@@ -149,16 +150,17 @@ export default function Navbar() {
 
           <div className="flex items-center gap-3">
             {/* Static link, no auth state: renders the same on the server and the client. */}
-            <NavLink to="/login" className={(s) => `${linkClass(s)} mr-3 hidden text-xs font-bold uppercase tracking-[0.14em] lg:inline-flex`}>
+            <NavLink to="/login" className={(s) => `${linkClass(s)} mr-1 hidden text-sm font-medium lg:inline-flex`}>
               Sign in
             </NavLink>
-            <button type="button" onClick={openGetStarted} className="btn-primary hidden min-h-11 px-6 py-2.5 text-xs lg:inline-flex">
+            <ThemeToggle />
+            <button type="button" onClick={openGetStarted} className="btn-primary hidden min-h-11 px-6 py-2.5 text-sm lg:inline-flex">
               Get Started
             </button>
             <button
               type="button"
               onClick={() => setIsMobileOpen((v) => !v)}
-              className="grid h-11 w-11 place-items-center rounded-full border border-line bg-white/5 text-white transition hover:bg-white/10 lg:hidden"
+              className="grid h-11 w-11 place-items-center rounded-full border border-line bg-ink/5 text-ink transition hover:bg-ink/10 lg:hidden"
               aria-label={isMobileOpen ? "Close menu" : "Open menu"}
               aria-expanded={isMobileOpen}
               aria-controls="mobile-menu"

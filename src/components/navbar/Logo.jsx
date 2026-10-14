@@ -1,12 +1,11 @@
 import React from "react";
 
-// Wordmark from the brand logo: red "r" and "s" (client-approved), white "e" for dark backgrounds.
+// Wordmark: "res" in ink with a lime full stop, the signal colour of the brand.
 export default function Logo({ className = "text-3xl md:text-4xl" }) {
   return (
-    <span className={`select-none font-display font-bold tracking-tighter text-white ${className}`} aria-label="res">
-      <span className="text-logo" aria-hidden="true">r</span>
-      <span aria-hidden="true">e</span>
-      <span className="text-logo" aria-hidden="true">s</span>
+    <span className={`select-none font-display font-extrabold tracking-[-0.06em] text-ink ${className}`} aria-label="res">
+      <span aria-hidden="true">res</span>
+      <span className="text-brand-ink" aria-hidden="true">.</span>
     </span>
   );
 }

@@ -59,7 +59,7 @@ export default function TaskCard({ initialTask, canStart, onRetried }) {
   };
 
   return (
-    <div className="mt-3 rounded-2xl border border-line bg-black/40 p-4">
+    <div className="mt-3 rounded-2xl border border-line bg-canvas/40 p-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <p className="font-bold">{task.label}</p>
         <p className="text-xs text-subtle">
@@ -76,7 +76,7 @@ export default function TaskCard({ initialTask, canStart, onRetried }) {
           <textarea id={`det-${task.id}`} className="field" rows={3} value={brief.details} onChange={(e) => setBrief((b) => ({ ...b, details: e.target.value }))} />
         </div>
       ) : (
-        <p className="mt-2 text-sm text-zinc-300">{(editing ? brief : task.brief).summary}</p>
+        <p className="mt-2 text-sm text-ink-soft">{(editing ? brief : task.brief).summary}</p>
       )}
 
       {task.status === "proposed" && (
@@ -105,7 +105,7 @@ export default function TaskCard({ initialTask, canStart, onRetried }) {
       {task.status === "failed" && (
         <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
           {/* The task's own failure is history, not news: plain text. Only errors from the user's click alert. */}
-          <p className="flex items-center gap-2 text-red-300"><CircleAlert size={16} aria-hidden="true" /> {task.error}</p>
+          <p className="flex items-center gap-2 text-danger"><CircleAlert size={16} aria-hidden="true" /> {task.error}</p>
           <button type="button" onClick={retry} disabled={busy} className="btn-secondary min-h-11 px-4 py-2 text-sm"><RotateCcw size={16} aria-hidden="true" /> Retry</button>
         </div>
       )}

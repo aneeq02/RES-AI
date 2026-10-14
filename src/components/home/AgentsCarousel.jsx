@@ -35,7 +35,7 @@ export default function AgentsCarousel({
   };
 
   const arrow =
-    "grid h-12 w-12 place-items-center rounded-full border border-line-strong bg-white/5 text-white transition hover:border-white/30 hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-white/5";
+    "grid h-12 w-12 place-items-center rounded-full border border-line-strong bg-ink/5 text-ink transition hover:border-ink/30 hover:bg-ink/10 disabled:opacity-30 disabled:hover:bg-ink/5";
 
   return (
     <section className="py-20 md:py-28" aria-roledescription="carousel" aria-label="AI specialists">
@@ -74,10 +74,10 @@ export default function AgentsCarousel({
                 <h3 className="text-2xl font-bold tracking-tight">{m.name}</h3>
               </div>
               <p className="mt-1 text-sm font-bold uppercase tracking-[0.12em] text-brand-ink">{m.role}</p>
-              <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-zinc-300">{m.description}</p>
+              <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-ink-soft">{m.description}</p>
               <Link
                 to={`/agents#${m.id}`}
-                className="mt-auto inline-flex min-h-11 items-center gap-2 pt-5 text-sm font-bold text-white transition group-hover:text-brand-ink"
+                className="mt-auto inline-flex min-h-11 items-center gap-2 pt-5 text-sm font-bold text-ink transition group-hover:text-brand-ink"
               >
                 Meet {m.name} <ArrowRight size={16} aria-hidden="true" className="transition-transform group-hover:translate-x-1" />
               </Link>

@@ -33,7 +33,7 @@ export default function ServiceDetail({ eyebrow, title, intro, features, process
         <motion.ul {...inViewStagger} className="grid gap-6 md:grid-cols-2">
           {features.map(({ icon: Icon, title: fTitle, body }, i) => (
             <motion.li key={fTitle} variants={itemStagger} className="card card-hover relative overflow-hidden p-8 md:p-10">
-              <span className="absolute -right-3 -top-8 select-none font-display text-[140px] font-bold leading-none text-white/[0.04]" aria-hidden="true">
+              <span className="absolute -right-3 -top-8 select-none font-display text-[140px] font-bold leading-none text-ink/[0.04]" aria-hidden="true">
                 {String(i + 1).padStart(2, "0")}
               </span>
               <div className="grid h-12 w-12 place-items-center rounded-2xl border border-brand/25 bg-brand/10 text-brand-ink">
@@ -55,7 +55,7 @@ export default function ServiceDetail({ eyebrow, title, intro, features, process
             <motion.ol {...inViewStagger} className="relative space-y-4 border-l border-line pl-8">
               {process.steps.map((s, i) => (
                 <motion.li key={s.title} variants={itemStagger} className="relative">
-                  <span className="absolute -left-[3.05rem] top-5 grid h-8 w-8 place-items-center rounded-full bg-brand text-sm font-bold text-white">
+                  <span className="absolute -left-[3.05rem] top-5 grid h-8 w-8 place-items-center rounded-full bg-brand text-sm font-bold text-on-brand">
                     {i + 1}
                   </span>
                   <div className="card p-6">
@@ -64,7 +64,7 @@ export default function ServiceDetail({ eyebrow, title, intro, features, process
                     {s.points && (
                       <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
                         {s.points.map((p) => (
-                          <li key={p} className="flex items-center gap-1.5 text-sm text-zinc-300">
+                          <li key={p} className="flex items-center gap-1.5 text-sm text-ink-soft">
                             <Check size={14} className="text-brand-ink" aria-hidden="true" /> {p}
                           </li>
                         ))}

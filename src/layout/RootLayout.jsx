@@ -18,10 +18,10 @@ export default function RootLayout() {
   const location = useLocation();
 
   return (
-    <div className="flex min-h-screen flex-col overflow-x-clip bg-black text-white">
+    <div className="flex min-h-screen flex-col overflow-x-clip text-ink">
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[10001] focus:rounded-full focus:bg-white focus:px-5 focus:py-3 focus:text-sm focus:font-bold focus:text-black"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[10001] focus:rounded-full focus:bg-ink focus:px-5 focus:py-3 focus:text-sm focus:font-bold focus:text-canvas"
       >
         Skip to content
       </a>

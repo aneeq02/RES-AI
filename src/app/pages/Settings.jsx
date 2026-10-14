@@ -37,7 +37,7 @@ export default function Settings() {
         <p className="mt-1 text-sm text-muted">Your agents read this before every task.</p>
         <div className="mt-6">
           <ProfileForm key={me.business?.company} initial={toForm(me)} onSubmit={save} submitLabel="Save changes" />
-          {saved && <p role="status" className="mt-3 text-sm text-emerald-300">Saved.</p>}
+          {saved && <p role="status" className="mt-3 text-sm text-ok">Saved.</p>}
         </div>
       </section>
       <aside className="card h-fit p-6" aria-labelledby="plan-h">
@@ -51,7 +51,7 @@ export default function Settings() {
             <div className="flex justify-between"><dt className="text-muted">Resets</dt><dd>{formatDate(me.credits.resetsAt)}</dd></div>
           </dl>
         ) : (
-          <p className="mt-4 text-sm text-muted">No active plan. <Link to="/checkout" className="font-bold text-white underline">Choose one</Link></p>
+          <p className="mt-4 text-sm text-muted">No active plan. <Link to="/checkout" className="font-bold text-ink underline">Choose one</Link></p>
         )}
         <button type="button" onClick={openPortal} className="btn-secondary mt-6 w-full">Manage billing <ExternalLink size={16} aria-hidden="true" /></button>
         {portalError && <p className="field-error" role="alert">{portalError}</p>}

@@ -55,7 +55,7 @@ export default function Team() {
   return (
     <div>
       {notice?.tone === "success" && (
-        <p role="status" className="mb-6 flex items-center gap-2 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200">
+        <p role="status" className="mb-6 flex items-center gap-2 rounded-2xl border border-emerald-400/30 bg-ok/10 px-4 py-3 text-sm text-ok">
           <CircleCheck size={18} aria-hidden="true" /> {notice.text}
         </p>
       )}
@@ -85,7 +85,7 @@ export default function Team() {
               <div className="flex flex-1 flex-col p-5">
                 <div className="flex items-center justify-between gap-2">
                   <h2 className="text-xl font-bold">{m.name}</h2>
-                  <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${isLive ? "bg-emerald-400/15 text-emerald-300" : "bg-white/5 text-subtle"}`}>
+                  <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${isLive ? "bg-ok/15 text-ok" : "bg-ink/5 text-subtle"}`}>
                     {isLive ? "Available" : `Coming soon · #${i + 1}`}
                   </span>
                 </div>

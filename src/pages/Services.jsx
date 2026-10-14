@@ -49,16 +49,16 @@ export default function Services() {
                 }`}
               >
                 <div className="flex items-start justify-between">
-                  <div className={`grid h-14 w-14 place-items-center rounded-2xl ${featured ? "bg-brand text-white" : "border border-line bg-white/5 text-brand-ink"}`}>
+                  <div className={`grid h-14 w-14 place-items-center rounded-2xl ${featured ? "bg-brand text-on-brand" : "border border-line bg-ink/5 text-brand-ink"}`}>
                     <Icon size={26} aria-hidden="true" />
                   </div>
-                  <ArrowRight size={24} className="text-subtle transition group-hover:translate-x-1 group-hover:text-white" aria-hidden="true" />
+                  <ArrowRight size={24} className="text-subtle transition group-hover:translate-x-1 group-hover:text-ink" aria-hidden="true" />
                 </div>
                 <h2 className="mt-8 text-3xl font-bold tracking-tight">{title}</h2>
                 <p className="mt-3 leading-relaxed text-muted">{body}</p>
                 <ul className="mt-auto flex flex-wrap gap-2 pt-8">
                   {points.map((p) => (
-                    <li key={p} className="rounded-full border border-line bg-black/30 px-3 py-1.5 text-xs font-medium text-zinc-300">
+                    <li key={p} className="rounded-full border border-line bg-canvas/30 px-3 py-1.5 text-xs font-medium text-ink-soft">
                       {p}
                     </li>
                   ))}

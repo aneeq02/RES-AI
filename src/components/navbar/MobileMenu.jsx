@@ -4,6 +4,7 @@ import { NavLink } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { NAV_LINKS, SERVICE_LINKS, CONTACT } from "../../data/nav";
 import useDialog from "../../hooks/useDialog";
+import ThemeToggle from "./ThemeToggle";
 
 const item = {
   hidden: { opacity: 0, x: -12 },
@@ -11,7 +12,7 @@ const item = {
 };
 
 const bigLink = ({ isActive }) =>
-  `block py-2 font-display text-3xl font-bold tracking-tight transition-colors ${isActive ? "text-brand-ink" : "text-white hover:text-brand-ink"}`;
+  `block py-2 font-display text-3xl font-bold tracking-tight transition-colors ${isActive ? "text-brand-ink" : "text-ink hover:text-brand-ink"}`;
 
 export default function MobileMenu({ isOpen, onClose, onOpenGetStarted }) {
   const ref = useDialog(isOpen, onClose);
@@ -28,7 +29,7 @@ export default function MobileMenu({ isOpen, onClose, onOpenGetStarted }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0, transition: { duration: 0.15 } }}
-          className="fixed inset-0 top-18 z-[9998] flex flex-col overflow-y-auto bg-black/95 px-6 pb-8 pt-6 backdrop-blur-xl md:top-20 lg:hidden"
+          className="fixed inset-0 top-18 z-[9998] flex flex-col overflow-y-auto bg-canvas/95 px-6 pb-8 pt-6 backdrop-blur-xl md:top-20 lg:hidden"
         >
           <motion.ul
             className="flex flex-col gap-1"
@@ -42,7 +43,7 @@ export default function MobileMenu({ isOpen, onClose, onOpenGetStarted }) {
               </NavLink>
             </motion.li>
             <motion.li variants={item} className="my-2 border-l border-line pl-4">
-              <NavLink to="/services" className="block py-1.5 text-xs font-bold uppercase tracking-[0.16em] text-subtle">
+              <NavLink to="/services" className="block py-1.5 font-mono text-xs font-semibold uppercase tracking-[0.16em] text-subtle">
                 Services
               </NavLink>
               {SERVICE_LINKS.map((l) => (
@@ -50,7 +51,7 @@ export default function MobileMenu({ isOpen, onClose, onOpenGetStarted }) {
                   key={l.to}
                   to={l.to}
                   className={({ isActive }) =>
-                    `flex min-h-11 items-center text-lg font-semibold transition-colors ${isActive ? "text-brand-ink" : "text-zinc-200 hover:text-white"}`
+                    `flex min-h-11 items-center text-lg font-semibold transition-colors ${isActive ? "text-brand-ink" : "text-ink-soft hover:text-ink"}`
                   }
                 >
                   {l.label}
@@ -82,9 +83,12 @@ export default function MobileMenu({ isOpen, onClose, onOpenGetStarted }) {
             >
               Get Started <ArrowRight size={18} aria-hidden="true" />
             </button>
-            <a href={`mailto:${CONTACT.email}`} className="mt-5 block text-center text-sm text-muted hover:text-white">
-              {CONTACT.email}
-            </a>
+            <div className="mt-5 flex items-center justify-between gap-4">
+              <a href={`mailto:${CONTACT.email}`} className="text-sm text-muted hover:text-ink">
+                {CONTACT.email}
+              </a>
+              <ThemeToggle />
+            </div>
           </div>
         </motion.div>
       )}

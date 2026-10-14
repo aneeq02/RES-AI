@@ -71,7 +71,7 @@ export default function Contact() {
               return (
                 <li key={label}>
                   {href ? (
-                    <a href={href} className="flex items-center gap-4 rounded-2xl p-2 -m-2 transition hover:bg-white/5">
+                    <a href={href} className="flex items-center gap-4 rounded-2xl p-2 -m-2 transition hover:bg-ink/5">
                       {inner}
                     </a>
                   ) : (
@@ -88,12 +88,12 @@ export default function Contact() {
             <AnimatePresence mode="wait">
               {status === "sent" ? (
                 <motion.div key="sent" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="py-10 text-center" role="status">
-                  <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-400/15 text-emerald-300">
+                  <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-ok/15 text-ok">
                     <CircleCheck size={32} aria-hidden="true" />
                   </div>
                   <h2 className="mt-6 text-3xl font-bold tracking-tight">Message sent</h2>
                   <p className="mt-3 text-muted">
-                    Thanks, {values.name.split(" ")[0]}. We'll reply to <span className="text-white">{values.email}</span> soon.
+                    Thanks, {values.name.split(" ")[0]}. We'll reply to <span className="text-ink">{values.email}</span> soon.
                   </p>
                   <button
                     type="button"
@@ -127,7 +127,7 @@ export default function Contact() {
                         <label
                           key={t}
                           className={`inline-flex min-h-11 cursor-pointer items-center rounded-full border px-4 text-sm font-medium transition has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-ink ${
-                            values.topic === t ? "border-brand bg-brand text-white" : "border-line bg-black/40 text-zinc-300 hover:border-line-strong"
+                            values.topic === t ? "border-brand bg-brand text-on-brand" : "border-line bg-canvas/40 text-ink-soft hover:border-line-strong"
                           }`}
                         >
                           <input type="radio" name="topic" value={t} checked={values.topic === t} onChange={set("topic")} className="sr-only" />

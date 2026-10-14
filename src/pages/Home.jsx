@@ -79,24 +79,30 @@ const BENEFITS = [
 function Hero() {
   return (
     <section className="relative isolate overflow-hidden pt-28 md:pt-32">
+      {/* Faint blueprint grid that fades out toward the edges */}
       <div
-        className="pointer-events-none absolute -right-40 -top-40 -z-10 h-[700px] w-[700px] rounded-full bg-gradient-to-br from-brand/30 to-purple-700/20 blur-[140px]"
+        className="pointer-events-none absolute inset-0 -z-10 opacity-[0.5] [mask-image:radial-gradient(70%_60%_at_50%_30%,#000,transparent)]"
+        style={{
+          backgroundImage:
+            "linear-gradient(var(--c-line) 1px, transparent 1px), linear-gradient(90deg, var(--c-line) 1px, transparent 1px)",
+          backgroundSize: "56px 56px",
+        }}
         aria-hidden="true"
       />
       <div className="container-page grid items-center gap-12 pb-16 lg:grid-cols-[1.1fr_1fr] lg:gap-16 lg:pb-24">
         {/* No entrance fade: the headline is the LCP element and must paint immediately from the prerendered HTML */}
         <div>
           <span className="eyebrow mb-6">
-            <span className="h-2 w-2 rounded-full bg-brand-ink" aria-hidden="true" /> Always-on AI teammates
+            <span className="h-2 w-2 animate-pulse-ring rounded-full bg-brand" aria-hidden="true" /> Always-on AI teammates
           </span>
-          <h1 className="text-[clamp(2.75rem,7vw,5.5rem)] font-bold leading-[0.95] tracking-tight">
-            AI employees that <span className="text-brand-ink">never sleep.</span>
+          <h1 className="text-[clamp(2.9rem,7.4vw,6rem)] font-extrabold leading-[0.92] tracking-[-0.04em]">
+            AI employees that <span className="hl">never sleep.</span>
           </h1>
-          <p className="mt-6 max-w-lg text-lg leading-relaxed text-zinc-300 md:text-xl">
+          <p className="mt-6 max-w-lg animate-rise text-lg leading-relaxed text-ink-soft [animation-delay:120ms] md:text-xl">
             Build, grow, and scale with specialists that handle the repetitive work — so your human team stays focused on what matters.
           </p>
 
-          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-10 flex animate-rise flex-col gap-3 [animation-delay:220ms] sm:flex-row">
             <Link to="/agents" className="btn-primary btn-lg">
               Meet the team <ArrowRight size={18} aria-hidden="true" />
             </Link>
@@ -105,9 +111,9 @@ function Hero() {
             </Link>
           </div>
 
-          <ul className="mt-10 grid max-w-lg grid-cols-3 gap-4">
+          <ul className="mt-10 grid max-w-lg animate-rise grid-cols-3 gap-4 [animation-delay:320ms]">
             {BENEFITS.map(({ icon: Icon, title }) => (
-              <li key={title} className="flex items-start gap-2 text-sm text-zinc-300">
+              <li key={title} className="flex items-start gap-2 text-sm text-ink-soft">
                 <Icon size={18} className="mt-0.5 shrink-0 text-brand-ink" aria-hidden="true" />
                 {title}
               </li>
@@ -121,18 +127,18 @@ function Hero() {
           transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
           className="relative mx-auto w-full max-w-lg"
         >
-          <div className="relative aspect-[4/5] overflow-hidden rounded-[2.5rem] border border-line shadow-2xl lg:aspect-square">
+          <div className="relative aspect-[4/5] overflow-hidden rounded-[2.5rem] border border-line-strong shadow-2xl shadow-black/30 lg:aspect-square">
             <AutoVideo
               src="/animation homepage.mp4"
               label="Animated preview of res AI employees at work"
               className="h-full w-full object-cover"
               style={{ objectPosition: "75% center" }}
             />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" aria-hidden="true" />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-canvas/50 to-transparent" aria-hidden="true" />
           </div>
           {/* Floating status card */}
-          <div className="absolute -bottom-6 -left-4 flex items-center gap-3 rounded-2xl border border-line bg-surface-2/90 px-4 py-3 shadow-xl backdrop-blur-md sm:-left-8">
-            <div className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-400/15 text-emerald-300">
+          <div className="absolute -bottom-6 -left-4 flex animate-float items-center gap-3 rounded-2xl border border-line bg-surface-2/90 px-4 py-3 shadow-xl backdrop-blur-md sm:-left-8">
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-ok/15 text-ok">
               <Zap size={18} aria-hidden="true" />
             </div>
             <div>
@@ -148,8 +154,8 @@ function Hero() {
         <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-[2rem] border border-line bg-line md:grid-cols-4">
           {STATS.map((s) => (
             <div key={s.label} className="flex flex-col bg-surface px-6 py-6 text-center">
-              <dt className="order-2 mt-1 text-xs font-bold uppercase tracking-[0.14em] text-subtle">{s.label}</dt>
-              <dd className="font-display text-3xl font-bold tracking-tight">{s.value}</dd>
+              <dt className="order-2 mt-1 font-mono text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-subtle">{s.label}</dt>
+              <dd className="font-display text-4xl font-extrabold tracking-[-0.03em] text-brand-ink">{s.value}</dd>
             </div>
           ))}
         </dl>
@@ -203,10 +209,10 @@ export default function Home() {
         <motion.ol {...inViewStagger} className="mt-14 grid gap-6 md:grid-cols-3">
           {STEPS.map(({ icon: Icon, title, body }, i) => (
             <motion.li key={title} variants={itemStagger} className="card relative overflow-hidden p-8">
-              <span className="absolute -right-4 -top-8 select-none font-display text-[140px] font-bold leading-none text-white/[0.04]" aria-hidden="true">
+              <span className="absolute -right-4 -top-8 select-none font-display text-[140px] font-bold leading-none text-ink/[0.04]" aria-hidden="true">
                 {String(i + 1).padStart(2, "0")}
               </span>
-              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-brand text-white">
+              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-brand text-on-brand">
                 <Icon size={22} aria-hidden="true" />
               </div>
               <p className="mt-6 text-xs font-bold uppercase tracking-[0.16em] text-subtle">Step {i + 1}</p>
@@ -227,10 +233,10 @@ export default function Home() {
             <RevealOnScroll key={to}>
               <Link to={to} className="card card-hover group flex h-full flex-col p-8 md:p-10">
                 <div className="flex items-start justify-between">
-                  <div className="grid h-12 w-12 place-items-center rounded-2xl border border-line bg-white/5 text-brand-ink">
+                  <div className="grid h-12 w-12 place-items-center rounded-2xl border border-line bg-ink/5 text-brand-ink">
                     <Icon size={22} aria-hidden="true" />
                   </div>
-                  <ArrowRight size={22} className="text-subtle transition group-hover:translate-x-1 group-hover:text-white" aria-hidden="true" />
+                  <ArrowRight size={22} className="text-subtle transition group-hover:translate-x-1 group-hover:text-ink" aria-hidden="true" />
                 </div>
                 <p className="mt-8 text-xs font-bold uppercase tracking-[0.16em] text-subtle">{eyebrow}</p>
                 <h3 className="mt-2 text-3xl font-bold tracking-tight">{title}</h3>
@@ -256,7 +262,7 @@ export default function Home() {
           <motion.ul {...inViewStagger} className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-4">
             {INTEGRATIONS.map(({ name, note, icon: Icon }) => (
               <motion.li key={name} variants={itemStagger} className="card card-hover flex items-center gap-4 p-5">
-                <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white/5 text-zinc-200">
+                <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-ink/5 text-ink-soft">
                   <Icon size={20} aria-hidden="true" />
                 </div>
                 <div className="min-w-0">
@@ -286,7 +292,7 @@ export default function Home() {
                     </svg>
                   ))}
                 </div>
-                <blockquote className="flex-1 text-lg leading-relaxed text-zinc-100">"{t.quote}"</blockquote>
+                <blockquote className="flex-1 text-lg leading-relaxed text-ink-soft">"{t.quote}"</blockquote>
                 <figcaption className="mt-6 border-t border-line pt-5">
                   <p className="font-bold">{t.name}</p>
                   <p className="mt-1 text-sm text-subtle">{t.meta}</p>

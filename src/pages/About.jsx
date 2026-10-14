@@ -31,7 +31,7 @@ export default function About() {
         </RevealOnScroll>
         <RevealOnScroll delay={0.15}>
           <h2 className="text-3xl font-bold tracking-tight md:text-5xl">Why we exist</h2>
-          <div className="mt-6 space-y-5 text-lg leading-relaxed text-zinc-300">
+          <div className="mt-6 space-y-5 text-lg leading-relaxed text-ink-soft">
             <p>
               Traditional hiring is slow, expensive, and limited by geography. res gives you instant access to AI specialists that are trained,
               compliant, and ready to work from day one.

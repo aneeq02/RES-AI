@@ -18,7 +18,7 @@ export default function CTASection({
             aria-hidden="true"
           />
           <h2 className="mx-auto max-w-3xl text-3xl font-bold tracking-tight md:text-5xl">{title}</h2>
-          <p className="mx-auto mt-5 max-w-2xl text-lg text-zinc-300">{body}</p>
+          <p className="mx-auto mt-5 max-w-2xl text-lg text-ink-soft">{body}</p>
           <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
             <Link to={primary.to} className="btn-primary btn-lg">
               {primary.label} <ArrowRight size={18} aria-hidden="true" />

@@ -20,7 +20,7 @@ export default function Onboarding() {
   };
 
   return (
-    <div className="min-h-screen bg-black px-4 py-12 text-white">
+    <div className="min-h-screen bg-canvas px-4 py-12 text-ink">
       <div className="mx-auto max-w-xl">
         <Logo className="text-4xl" />
         <h1 className="mt-6 text-3xl font-bold tracking-tight">Tell your team about your business</h1>

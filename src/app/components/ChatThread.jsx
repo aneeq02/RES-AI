@@ -103,18 +103,18 @@ export default function ChatThread({ threadId, agent, canChat, starter, onActivi
           <div className="grid h-full place-items-center text-center">
             <div>
               <p className="text-lg font-bold">Ask {agent.name} anything</p>
-              <button type="button" onClick={() => setDraft(starter)} className="mt-3 rounded-full border border-line px-4 py-2 text-sm text-muted hover:text-white">"{starter}"</button>
+              <button type="button" onClick={() => setDraft(starter)} className="mt-3 rounded-full border border-line px-4 py-2 text-sm text-muted hover:text-ink">"{starter}"</button>
             </div>
           </div>
         )}
         {data.messages.map((m) => (
-          <div key={m.id} className={m.role === "user" ? "ml-auto max-w-[85%] rounded-2xl bg-white/10 px-4 py-3" : "max-w-[92%]"}>
+          <div key={m.id} className={m.role === "user" ? "ml-auto max-w-[85%] rounded-2xl bg-ink/10 px-4 py-3" : "max-w-[92%]"}>
             {m.content.map(renderBlock)}
           </div>
         ))}
         {streaming && (
           <>
-            <div className="ml-auto max-w-[85%] rounded-2xl bg-white/10 px-4 py-3"><p>{streaming.user}</p></div>
+            <div className="ml-auto max-w-[85%] rounded-2xl bg-ink/10 px-4 py-3"><p>{streaming.user}</p></div>
             <div className="max-w-[92%]">
               {streaming.text ? <Markdown text={streaming.text} /> : <LoaderCircle className="animate-spin text-muted" aria-label={`${agent.name} is typing`} />}
             </div>

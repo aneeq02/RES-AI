@@ -17,21 +17,21 @@ const signOut = async () => (await getSupabase())?.auth.signOut();
 export default function AppShell() {
   const { me } = useMe();
   return (
-    <div className="min-h-screen bg-black text-white">
-      <a href="#app-main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-white focus:px-5 focus:py-3 focus:text-sm focus:font-bold focus:text-black">Skip to content</a>
-      <header className="sticky top-0 z-40 border-b border-line bg-black/80 backdrop-blur">
+    <div className="min-h-screen bg-canvas text-ink">
+      <a href="#app-main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-ink focus:px-5 focus:py-3 focus:text-sm focus:font-bold focus:text-canvas">Skip to content</a>
+      <header className="sticky top-0 z-40 border-b border-line bg-canvas/80 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 md:px-6">
           <NavLink to="/app" aria-label="res workspace home"><Logo className="text-3xl" /></NavLink>
           <nav aria-label="Workspace" className="flex flex-1 gap-1 overflow-x-auto">
             {NAV.map(({ to, label, icon: Icon, end }) => (
               <NavLink key={to} to={to} end={end}
-                className={({ isActive }) => `inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-sm font-bold transition ${isActive ? "bg-white/10 text-white" : "text-muted hover:text-white"}`}>
+                className={({ isActive }) => `inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-sm font-bold transition ${isActive ? "bg-ink/10 text-ink" : "text-muted hover:text-ink"}`}>
                 <Icon size={16} aria-hidden="true" /> <span className="hidden sm:inline">{label}</span>
               </NavLink>
             ))}
           </nav>
           <CreditsMeter credits={me?.credits} />
-          <button type="button" onClick={signOut} className="grid h-11 w-11 place-items-center rounded-full text-muted hover:bg-white/5 hover:text-white" aria-label="Sign out">
+          <button type="button" onClick={signOut} className="grid h-11 w-11 place-items-center rounded-full text-muted hover:bg-ink/5 hover:text-ink" aria-label="Sign out">
             <LogOut size={18} aria-hidden="true" />
           </button>
         </div>

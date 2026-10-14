@@ -10,10 +10,10 @@ export default function CreditsMeter({ credits }) {
   return (
     <div className="flex items-center gap-3 text-sm" aria-label={`${credits.balance} of ${credits.allowance} task credits left, resets ${formatDate(credits.resetsAt)}`}>
       <Coins size={16} className="text-brand-ink" aria-hidden="true" />
-      <div className="hidden h-1.5 w-24 overflow-hidden rounded-full bg-white/10 sm:block" aria-hidden="true">
+      <div className="hidden h-1.5 w-24 overflow-hidden rounded-full bg-ink/10 sm:block" aria-hidden="true">
         <div className="h-full rounded-full bg-brand" style={{ width: `${pct}%` }} />
       </div>
-      <span><span className="font-bold text-white">{credits.balance}</span><span className="text-subtle"> / {credits.allowance} credits</span></span>
+      <span><span className="font-bold text-ink">{credits.balance}</span><span className="text-subtle"> / {credits.allowance} credits</span></span>
     </div>
   );
 }

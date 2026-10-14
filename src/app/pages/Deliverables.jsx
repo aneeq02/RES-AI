@@ -20,7 +20,7 @@ export default function Deliverables() {
         <div role="group" aria-label="Filter by agent" className="mt-6 flex flex-wrap gap-2">
           {["all", ...agents].map((a) => (
             <button key={a} type="button" aria-pressed={agent === a} onClick={() => setAgent(a)}
-              className={`min-h-11 rounded-full border px-4 text-sm ${agent === a ? "border-brand bg-brand/10 text-white" : "border-line text-muted"}`}>
+              className={`min-h-11 rounded-full border px-4 text-sm ${agent === a ? "border-brand bg-brand/10 text-ink" : "border-line text-muted"}`}>
               {a === "all" ? "All" : getMember(a)?.name ?? a}
             </button>
           ))}
@@ -30,13 +30,13 @@ export default function Deliverables() {
         <p className="mt-8 text-muted" role="status">Loading…</p>
       ) : visible.length === 0 ? (
         <div className="card mt-8 p-8 text-center text-muted">
-          No reports yet. <Link to="/app/agents/buddy" className="font-bold text-white underline">Ask Buddy for one</Link>.
+          No reports yet. <Link to="/app/agents/buddy" className="font-bold text-ink underline">Ask Buddy for one</Link>.
         </div>
       ) : (
         <ul className="mt-8 divide-y divide-line rounded-2xl border border-line">
           {visible.map((d) => (
             <li key={d.id}>
-              <Link to={`/app/deliverables/${d.id}`} className="flex min-h-14 items-center gap-4 px-4 py-3 transition hover:bg-white/5">
+              <Link to={`/app/deliverables/${d.id}`} className="flex min-h-14 items-center gap-4 px-4 py-3 transition hover:bg-ink/5">
                 <FileText size={18} className="shrink-0 text-brand-ink" aria-hidden="true" />
                 <span className="min-w-0 flex-1 truncate font-bold">{d.title}</span>
                 {d.partial && <span className="rounded-full bg-amber-400/15 px-2 py-0.5 text-xs text-amber-300">Partial</span>}

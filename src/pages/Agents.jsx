@@ -36,20 +36,20 @@ function AgentCard({ m }) {
       <div className="flex flex-col p-6 md:p-8">
         <div className="flex flex-wrap items-center gap-3">
           <h2 className="text-3xl font-bold tracking-tight">{m.name}</h2>
-          {!live && <span className="rounded-full bg-white/5 px-2.5 py-1 text-xs font-bold text-subtle">Coming soon</span>}
+          {!live && <span className="rounded-full bg-ink/5 px-2.5 py-1 text-xs font-bold text-subtle">Coming soon</span>}
         </div>
         <p className="mt-1 text-sm font-bold uppercase tracking-[0.12em] text-brand-ink">{m.role}</p>
-        <p className="mt-4 text-sm leading-relaxed text-zinc-300">{m.description}</p>
+        <p className="mt-4 text-sm leading-relaxed text-ink-soft">{m.description}</p>
 
         <ul className="mt-5 space-y-2">
           {m.skills.map((s) => (
-            <li key={s} className="flex items-center gap-2 text-sm text-zinc-200">
+            <li key={s} className="flex items-center gap-2 text-sm text-ink-soft">
               <Check size={16} className="shrink-0 text-brand-ink" aria-hidden="true" /> {s}
             </li>
           ))}
         </ul>
 
-        <p className="mt-5 flex items-start gap-2 rounded-2xl border border-line bg-black/40 px-4 py-3 text-sm italic text-muted">
+        <p className="mt-5 flex items-start gap-2 rounded-2xl border border-line bg-canvas/40 px-4 py-3 text-sm italic text-muted">
           <MessageSquare size={16} className="mt-0.5 shrink-0 not-italic" aria-hidden="true" />
           "{m.prompt}"
         </p>
@@ -57,7 +57,7 @@ function AgentCard({ m }) {
         <div className="mt-auto flex items-center justify-between gap-4 pt-6">
           <p className="text-sm text-subtle">Included in every plan</p>
           {live ? (
-            <Link to={`/app/agents/${m.id}`} className="btn-light min-h-11 px-6 py-2.5 text-xs group-hover:bg-brand group-hover:text-white">
+            <Link to={`/app/agents/${m.id}`} className="btn-light min-h-11 px-6 py-2.5 text-xs group-hover:bg-brand group-hover:text-on-brand">
               Start with {m.name} <ArrowRight size={16} aria-hidden="true" />
             </Link>
           ) : (
@@ -89,7 +89,7 @@ export default function Agents() {
               onClick={() => setFilter(f.id)}
               aria-pressed={filter === f.id}
               className={`min-h-11 shrink-0 rounded-full border px-5 text-sm font-bold transition ${
-                filter === f.id ? "border-brand bg-brand text-white" : "border-line bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-white"
+                filter === f.id ? "border-brand bg-brand text-on-brand" : "border-line bg-ink/5 text-ink-soft hover:bg-ink/10 hover:text-ink"
               }`}
             >
               {f.label}
