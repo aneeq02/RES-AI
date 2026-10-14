@@ -11,11 +11,13 @@ import { startQueue } from "./queue.js";
 import { processTaskJob } from "./worker.js";
 import { sweepStaleTasks } from "./runner/repo.js";
 import { grantAllDue } from "./billing/billing.js";
+import { fakeChatLlm, fakeDraftLlm, fakeTaskLlm } from "./fake/fakeAi.js";
 
 const env = loadEnv();
 const db = createPool(env.DATABASE_URL);
-const anthropic = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY, maxRetries: 3 });
-const taskLlm = anthropicTaskLlm(anthropic);
+const anthropic = env.FAKE_AI ? null : new Anthropic({ apiKey: env.ANTHROPIC_API_KEY, maxRetries: 3 });
+if (env.FAKE_AI) console.warn("FAKE_AI is on: replies are scripted, no Anthropic calls are made. Do not use this for real users.");
+const taskLlm = anthropic ? anthropicTaskLlm(anthropic) : fakeTaskLlm();
 
 // This process is the only worker, so anything still "running" at boot was interrupted.
 const interrupted = await sweepStaleTasks(db, 0);
@@ -34,8 +36,8 @@ await grantAllDue(db);
 const app = createApp({
   db,
   verifyToken: supabaseTokenVerifier(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY),
-  chatLlm: anthropicChatLlm(anthropic),
-  draftLlm: { create: (p) => anthropic.messages.create(p) },
+  chatLlm: anthropic ? anthropicChatLlm(anthropic) : fakeChatLlm(),
+  draftLlm: anthropic ? { create: (p) => anthropic.messages.create(p) } : fakeDraftLlm(),
   stripe: new Stripe(env.STRIPE_SECRET_KEY),
   enqueueTask: queue.enqueueTask,
   appUrl: env.APP_URL,
