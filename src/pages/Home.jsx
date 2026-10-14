@@ -26,6 +26,7 @@ import CTASection from "../components/ui/CTASection";
 import AutoVideo from "../components/ui/AutoVideo";
 import AgentsCarousel from "../components/home/AgentsCarousel";
 import ChatDemo from "../components/home/ChatDemo";
+import RoleTicker from "../components/home/RoleTicker";
 import { inViewStagger, itemStagger } from "../animations/variants";
 
 const STATS = [
@@ -169,13 +170,15 @@ export default function Home() {
     <>
       <Hero />
 
+      <RoleTicker />
+
       <AgentsCarousel />
 
       {/* Live demo */}
       <section className="border-y border-line bg-surface py-20 md:py-28">
         <div className="container-page grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
           <div>
-            <SectionHeading align="left" eyebrow="See it work" title={<>Tell them what to do.<br />They do it.</>}>
+            <SectionHeading align="left" eyebrow="See it work" title={<>Tell them what to do.<br /><span className="hl">They do it.</span></>}>
               Simple prompts, structured output. Refine, approve, and ship — without the back-and-forth.
             </SectionHeading>
             <RevealOnScroll delay={0.1}>
@@ -202,7 +205,7 @@ export default function Home() {
 
       {/* How it works */}
       <section className="container-page py-20 md:py-28">
-        <SectionHeading eyebrow="Setup in minutes" title="Train your helpers to sound like you.">
+        <SectionHeading eyebrow="Setup in minutes" title={<>Train your helpers to <span className="hl">sound like you.</span></>}>
           Add instructions, brand notes, and examples. The more context you provide, the more consistent the output.
         </SectionHeading>
 
@@ -251,7 +254,7 @@ export default function Home() {
       <section className="border-y border-line bg-surface py-20 md:py-28">
         <div className="container-page">
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-            <SectionHeading align="left" eyebrow="Integrations" title="Works with your stack.">
+            <SectionHeading align="left" eyebrow="Integrations" title={<>Works with <span className="hl">your stack.</span></>}>
               Don't change how you work. Plug helpers into the tools your team already trusts.
             </SectionHeading>
             <Link to="/contact" className="btn-secondary shrink-0">
@@ -277,7 +280,7 @@ export default function Home() {
 
       {/* Testimonials */}
       <section className="container-page py-20 md:py-28">
-        <SectionHeading eyebrow="Customers" title="Real teams. Real output.">
+        <SectionHeading eyebrow="Customers" title={<>Real teams. <span className="hl">Real output.</span></>}>
           The goal isn't "more AI". The goal is less friction and more progress.
         </SectionHeading>
 
