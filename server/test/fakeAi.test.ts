@@ -79,6 +79,13 @@ describe("fakeTaskLlm through the real runner", () => {
   });
 });
 
+describe("fakeTaskLlm failure trigger", () => {
+  it("throws when the brief contains [fail]", async () => {
+    const turn = { model: "m", system: "", maxTokens: 1, tools: [], messages: [{ role: "user" as const, content: "Brief: test [fail]" }] };
+    await expect(fakeTaskLlm({ stepDelayMs: 0 }).run(turn, () => {})).rejects.toThrow(/Simulated failure/);
+  });
+});
+
 describe("fakeDraftLlm", () => {
   it("drafts a profile named after the site", async () => {
     const msg = await fakeDraftLlm().create({ model: "m", max_tokens: 1, messages: [{ role: "user", content: "Read https://www.northwind.coffee and call submit_profile" }] });

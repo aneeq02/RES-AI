@@ -101,6 +101,8 @@ export function fakeTaskLlm(opts: { stepDelayMs?: number } = {}): TaskLlm {
       const first = turn.messages[0]?.content;
       const brief = (typeof first === "string" ? first : "").match(/^Brief: (.*)$/m)?.[1] ?? "Research report";
       await sleep(delay);
+      // Put "[fail]" in a brief to exercise the failure path: the task fails and its credits are refunded.
+      if (brief.includes("[fail]")) throw new Error("Simulated failure (test mode)");
 
       if (assistantTurns === 0) {
         const blocks = [

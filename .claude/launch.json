@@ -25,6 +25,17 @@
         "--strictPort"
       ],
       "port": 4173
+    },
+    {
+      "name": "res-api",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "server",
+        "run",
+        "dev"
+      ],
+      "port": 8787
     }
   ]
 }

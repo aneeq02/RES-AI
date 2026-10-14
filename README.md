@@ -13,10 +13,33 @@ npm run build    # production build in dist/
 npm run lint
 ```
 
+## Running the app (agents, accounts, billing)
+
+The marketing site runs on its own. To run the signed-in app (`/app`) you also need the API in `server/`, a Supabase project and a Stripe test account. Both are free.
+
+1. Create a free Supabase project. Under Authentication → URL configuration, add `http://localhost:5173/auth/callback` to the redirect URLs. Optionally enable the Google provider.
+2. Copy `server/.env.example` → `server/.env` and fill it in: the **session pooler** connection string (port 5432), the service-role key, a Stripe **test** secret key (`sk_test_…`) and an Anthropic API key. Never commit these files.
+3. Copy `.env.example` → `.env` and set `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` and `VITE_API_URL`.
+4. `npm install && npm --prefix server install`, then `npm --prefix server run migrate` and `npm --prefix server run stripe:setup`.
+5. Run `npm run dev:api` and `npm run dev` in two terminals.
+6. Pay with Stripe's test card `4242 4242 4242 4242`, any future date, any CVC. The success page confirms the subscription through `/billing/sync`. For webhooks, run `stripe listen --forward-to localhost:8787/stripe/webhook` and set `STRIPE_WEBHOOK_SECRET`.
+7. Tests: `npm test` (frontend) and `npm --prefix server test` (server, no network). `npm --prefix server run test:live` spends real API credits and needs `ANTHROPIC_API_KEY` exported.
+8. Deploying: `/app/*` must fall back to `index.html` (SPA rewrite). The API needs a long-running Node host (Railway, Render or Fly), not serverless functions.
+
+### Running without an Anthropic key (`FAKE_AI`)
+
+Set `FAKE_AI=true` in `server/.env` (leave `ANTHROPIC_API_KEY` empty) to run the whole product with scripted replies and no spend: sign-in, onboarding, "fill from my website", Stripe checkout, streaming chat, task approval with live progress, saved deliverables and credit accounting all work. Ask Buddy to *research*, *analyze* or *compare* something to get a task proposal. Put `[fail]` in a request to see the failure and refund path.
+
+Replies are scripted, so this says nothing about the real model's answers, web search or token costs. The server logs a warning when it is on and refuses to start with `FAKE_AI=true` and `NODE_ENV=production`.
+
 ## Project structure
 
 ```
+server/                     Node API (Hono + pg-boss + Stripe + Anthropic); see src/ for http, chat, runner, billing, fake
+supabase/migrations/         database schema, applied by `npm --prefix server run migrate`
 src/
+  app/                       signed-in workspace (/app): team, chat, task cards, deliverables, settings, onboarding
+  lib/                       api client, SSE parser, safe URLs, markdown sanitizer, subscription helpers
   animations/variants.js     shared Framer Motion variants
   components/
     agents/AgentAvatar.jsx   agent artwork, falls back to a role icon
@@ -36,7 +59,7 @@ src/
 
 ## Design system
 
-Tokens live in `src/index.css` (`@theme`): black surfaces, brand red `#dc2626` for fills (white text 4.8:1) and `#ff4d4d` for red text on dark (6.4:1). Headings use **Space Grotesk**, body text **DM Sans**. Reusable utilities: `btn-primary`, `btn-secondary`, `btn-light`, `card`, `field`, `eyebrow`, `container-page`.
+Tokens live in `src/index.css`: raw palette variables per theme (`:root` for **Midnight**, `[data-theme="light"]` for **Paper**) mapped to Tailwind utilities in `@theme inline` (`canvas`, `surface`, `ink`, `muted`, `line`, `brand`, `cta`). Acid-lime is the signal colour. Headings use **Bricolage Grotesque**, body text **Instrument Sans**, labels **JetBrains Mono**. Reusable utilities: `btn-primary`, `btn-secondary`, `btn-light`, `card`, `card-hover`, `spot` (cursor spotlight), `hl` (highlighted headline words), `kicker`, `field`, `eyebrow`, `container-page`. A theme toggle in the navbar and app header stores the choice in `localStorage` (`res-theme`), applied before first paint by an inline script in `index.html`.
 
 Accessibility: visible focus rings, skip link, keyboard-operable menus/modals with focus trap, 44px touch targets, `prefers-reduced-motion` respected (animations, auto-playing video and the chat demo).
 
