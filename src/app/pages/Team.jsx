@@ -55,7 +55,7 @@ export default function Team() {
   return (
     <div>
       {notice?.tone === "success" && (
-        <p role="status" className="mb-6 flex items-center gap-2 rounded-2xl border border-emerald-400/30 bg-ok/10 px-4 py-3 text-sm text-ok">
+        <p role="status" className="mb-6 flex items-center gap-2 rounded-2xl border border-ok/30 bg-ok/10 px-4 py-3 text-sm text-ok">
           <CircleCheck size={18} aria-hidden="true" /> {notice.text}
         </p>
       )}
@@ -75,27 +75,27 @@ export default function Team() {
         </div>
       )}
       <p className="eyebrow">Your team</p>
-      <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">Who should we put to work?</h1>
+      <h1 className="mt-4 text-4xl font-extrabold leading-[1.02] tracking-[-0.035em] md:text-6xl">Who should we <span className="hl">put to work?</span></h1>
       <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {ROLLOUT.map((m, i) => {
           const isLive = live.has(m.id);
           return (
-            <li key={m.id} className={`card flex flex-col overflow-hidden ${isLive ? "" : "opacity-60"}`}>
+            <li key={m.id} className={`card flex flex-col overflow-hidden ${isLive ? "card-hover border-brand/40 shadow-[0_20px_50px_-24px_var(--c-brand)]" : "opacity-60 [&_img]:grayscale"}`}>
               <AgentAvatar member={m} className="aspect-[4/3]" imgClassName="pt-4" />
               <div className="flex flex-1 flex-col p-5">
                 <div className="flex items-center justify-between gap-2">
-                  <h2 className="text-xl font-bold">{m.name}</h2>
-                  <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${isLive ? "bg-ok/15 text-ok" : "bg-ink/5 text-subtle"}`}>
+                  <h2 className="text-2xl font-extrabold tracking-[-0.02em]">{m.name}</h2>
+                  <span className={`rounded-full px-2.5 py-1 font-mono text-[0.65rem] font-semibold uppercase tracking-[0.08em] ${isLive ? "bg-ok/15 text-ok" : "bg-ink/5 text-subtle"}`}>
                     {isLive ? "Available" : `Coming soon · #${i + 1}`}
                   </span>
                 </div>
-                <p className="mt-1 text-sm text-brand-ink">{m.role}</p>
+                <p className="mt-1 font-mono text-xs font-semibold uppercase tracking-[0.1em] text-brand-ink">{m.role}</p>
                 {isLive ? (
-                  <Link to={`/app/agents/${m.id}`} className="btn-light mt-auto min-h-11 pt-0 text-xs">
+                  <Link to={`/app/agents/${m.id}`} className="btn-primary mt-4 min-h-11 px-5 py-2.5 text-sm">
                     <Sparkles size={16} aria-hidden="true" /> Work with {m.name}
                   </Link>
                 ) : (
-                  <p className="mt-auto pt-4 text-xs text-subtle">Launching in order. {m.name} is next after the agents above.</p>
+                  <p className="mt-auto pt-4 font-mono text-[0.7rem] text-subtle">Launching in order. {m.name} is next after the agents above.</p>
                 )}
               </div>
             </li>

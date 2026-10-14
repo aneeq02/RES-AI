@@ -86,7 +86,7 @@ export default function ChatThread({ threadId, agent, canChat, starter, onActivi
     if (b.type === "deliverable" && data.deliverables[b.deliverableId]) {
       const d = data.deliverables[b.deliverableId];
       return (
-        <Link key={i} to={`/app/deliverables/${d.id}`} className="flex items-center gap-3 rounded-xl border border-line p-3 text-sm transition hover:border-brand/50">
+        <Link key={i} to={`/app/deliverables/${d.id}`} className="spot mt-3 flex items-center gap-3 rounded-xl border border-line bg-surface-2/60 p-3 text-sm transition hover:border-brand/50">
           <FileText size={18} className="text-brand-ink" aria-hidden="true" /> <span><span className="font-bold">Report ready:</span> {d.title}</span>
         </Link>
       );
@@ -102,19 +102,20 @@ export default function ChatThread({ threadId, agent, canChat, starter, onActivi
         {empty && (
           <div className="grid h-full place-items-center text-center">
             <div>
-              <p className="text-lg font-bold">Ask {agent.name} anything</p>
-              <button type="button" onClick={() => setDraft(starter)} className="mt-3 rounded-full border border-line px-4 py-2 text-sm text-muted hover:text-ink">"{starter}"</button>
+              <p className="font-display text-3xl font-extrabold tracking-[-0.03em]">Ask {agent.name} <span className="hl">anything</span></p>
+              <button type="button" onClick={() => setDraft(starter)} className="mt-4 rounded-full border border-brand/40 bg-brand/10 px-5 py-2.5 text-sm text-ink transition hover:bg-brand/20">"{starter}"</button>
             </div>
           </div>
         )}
         {data.messages.map((m) => (
-          <div key={m.id} className={m.role === "user" ? "ml-auto max-w-[85%] rounded-2xl bg-ink/10 px-4 py-3" : "max-w-[92%]"}>
+          <div key={m.id} className={m.role === "user" ? "ml-auto max-w-[85%] rounded-2xl rounded-br-md border border-brand/30 bg-brand/10 px-4 py-3" : "max-w-[92%]"}>
+            {m.role !== "user" && <span aria-hidden="true" className="mb-1.5 flex items-center gap-2 font-mono text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-subtle"><span className="h-1.5 w-1.5 rounded-full bg-brand" />{agent.name}</span>}
             {m.content.map(renderBlock)}
           </div>
         ))}
         {streaming && (
           <>
-            <div className="ml-auto max-w-[85%] rounded-2xl bg-ink/10 px-4 py-3"><p>{streaming.user}</p></div>
+            <div className="ml-auto max-w-[85%] rounded-2xl rounded-br-md border border-brand/30 bg-brand/10 px-4 py-3"><p>{streaming.user}</p></div>
             <div className="max-w-[92%]">
               {streaming.text ? <Markdown text={streaming.text} /> : <LoaderCircle className="animate-spin text-muted" aria-label={`${agent.name} is typing`} />}
             </div>
@@ -124,7 +125,7 @@ export default function ChatThread({ threadId, agent, canChat, starter, onActivi
       {/* Announces each finished reply once, instead of re-reading the growing stream on every delta. */}
       <p role="status" className="sr-only">{announcement}</p>
       {error && <p className="field-error" role="alert">{error}</p>}
-      <form onSubmit={send} className="mt-4 flex items-end gap-2 rounded-2xl border border-line bg-surface-2 p-2">
+      <form onSubmit={send} className="mt-4 flex items-end gap-2 rounded-3xl border border-line-strong bg-surface-2/70 p-2 backdrop-blur-md transition focus-within:border-brand-ink focus-within:ring-2 focus-within:ring-brand/20">
         <label htmlFor="chat-input" className="sr-only">Message {agent.name}</label>
         <textarea id="chat-input" rows={1} value={draft} disabled={!canChat} maxLength={4000}
           onChange={(e) => setDraft(e.target.value)}

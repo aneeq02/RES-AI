@@ -20,10 +20,10 @@ export default function Onboarding() {
   };
 
   return (
-    <div className="min-h-screen bg-canvas px-4 py-12 text-ink">
+    <div className="min-h-screen px-4 py-12 text-ink">
       <div className="mx-auto max-w-xl">
         <Logo className="text-4xl" />
-        <h1 className="mt-6 text-3xl font-bold tracking-tight">Tell your team about your business</h1>
+        <h1 className="mt-8 text-4xl font-extrabold leading-[1.02] tracking-[-0.035em] md:text-5xl">Tell your team about <span className="hl">your business</span></h1>
         <p className="mt-2 text-muted">Every agent reads this before it works for you. You can change it any time in Settings.</p>
         <div className="card mt-8 p-6 md:p-8">
           <ProfileForm initial={toForm(me)} onSubmit={save} submitLabel="Finish setup" stepped showDraft />

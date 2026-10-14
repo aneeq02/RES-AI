@@ -56,7 +56,7 @@ export default function AgentWorkspace() {
     return (
       <div className="card mx-auto max-w-lg p-8 text-center">
         <AgentAvatar member={member} className="mx-auto aspect-square w-40 rounded-2xl" />
-        <h1 className="mt-6 text-2xl font-bold">{member.name} is coming soon</h1>
+        <h1 className="mt-6 text-3xl font-extrabold tracking-[-0.03em]">{member.name} is <span className="hl">coming soon</span></h1>
         <p className="mt-2 text-muted">Agents launch one at a time. {member.name} will appear here as soon as they're ready.</p>
         <Link to="/app" className="btn-secondary mt-6"><ArrowLeft size={16} aria-hidden="true" /> Back to your team</Link>
       </div>
@@ -66,10 +66,10 @@ export default function AgentWorkspace() {
     <div className="grid gap-6 lg:grid-cols-[240px_1fr]">
       <aside className="space-y-4">
         <div className="flex items-center gap-3">
-          <AgentAvatar member={member} className="h-14 w-12 shrink-0 rounded-xl" />
+          <AgentAvatar member={member} className="h-16 w-14 shrink-0 rounded-2xl border border-line" />
           <div>
-            <h1 className="text-lg font-bold">{member.name}</h1>
-            <p className="text-xs text-brand-ink">{member.role}</p>
+            <h1 className="text-2xl font-extrabold tracking-[-0.02em]">{member.name}</h1>
+            <p className="font-mono text-[0.68rem] font-semibold uppercase tracking-[0.1em] text-brand-ink">{member.role}</p>
           </div>
         </div>
         <ThreadList threads={threads} activeId={activeId} onSelect={(tid) => setParams({ thread: tid })} onNew={newThread} />

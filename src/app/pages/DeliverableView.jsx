@@ -49,7 +49,7 @@ function DeliverableContent({ id }) {
     <article className="mx-auto max-w-3xl">
       <Link to="/app/deliverables" className="inline-flex min-h-11 items-center gap-2 text-sm text-muted hover:text-ink"><ArrowLeft size={16} aria-hidden="true" /> All deliverables</Link>
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-subtle">{getMember(d.agentId)?.name} · {formatDate(d.createdAt)}{d.partial ? " · Partial: research limit reached" : ""}</p>
+        <p className="font-mono text-xs uppercase tracking-[0.12em] text-subtle">{getMember(d.agentId)?.name} · {formatDate(d.createdAt)}{d.partial ? " · Partial: research limit reached" : ""}</p>
         <div className="flex gap-2">
           <button type="button" onClick={copy} className="btn-secondary min-h-11 px-4 py-2 text-sm">{copied ? <Check size={16} aria-hidden="true" /> : <Copy size={16} aria-hidden="true" />} {copied ? "Copied" : "Copy"}</button>
           <button type="button" onClick={download} className="btn-secondary min-h-11 px-4 py-2 text-sm"><Download size={16} aria-hidden="true" /> .md</button>
@@ -57,10 +57,10 @@ function DeliverableContent({ id }) {
         </div>
       </div>
       {copyError && <p role="alert" className="mt-4 rounded bg-danger/20 px-4 py-2 text-sm text-danger">Couldn't copy. Select the text and copy it manually.</p>}
-      <div className="card mt-6 p-6 md:p-10"><Markdown text={d.bodyMd} /></div>
+      <div className="card mt-6 border-line-strong bg-surface-2/80 p-6 md:p-12"><Markdown text={d.bodyMd} /></div>
       {d.sources.length > 0 && (
         <section className="mt-8" aria-labelledby="sources-h">
-          <h2 id="sources-h" className="text-lg font-bold">Sources</h2>
+          <h2 id="sources-h" className="kicker">Sources</h2>
           <ol className="mt-3 list-decimal space-y-1 pl-5 text-sm text-muted">
             {d.sources.map((s) => {
               const href = safeHref(s.url);

@@ -90,7 +90,12 @@ export default function ProfileForm({ initial, onSubmit, submitLabel, stepped = 
   return (
     <form onSubmit={submit} noValidate className="space-y-6">
       {stepped && (
-        <h2 ref={stepHeading} tabIndex={-1} className="text-sm font-normal text-subtle outline-none">
+        <div className="flex gap-2" aria-hidden="true">
+          {STEPS.map((s, i) => <span key={s.title} className={`h-1 flex-1 rounded-full transition-colors duration-300 ${i <= step ? "bg-brand" : "bg-ink/10"}`} />)}
+        </div>
+      )}
+      {stepped && (
+        <h2 ref={stepHeading} tabIndex={-1} className="font-mono text-xs font-semibold uppercase tracking-[0.12em] text-subtle outline-none">
           Step {step + 1} of {STEPS.length} · {STEPS[step].title}
         </h2>
       )}
