@@ -45,7 +45,7 @@ export default function Contact() {
           <span className="eyebrow mb-6">Contact</span>
           <h1 className="page-title">
             Let's build <br />
-            your team.
+            <span className="hl">your team.</span>
           </h1>
           <p className="mt-6 max-w-md text-lg text-muted">
             Ready to automate? Send us a note and a real person from our onboarding team will get back to you.
@@ -63,7 +63,7 @@ export default function Contact() {
                     <Icon size={20} aria-hidden="true" />
                   </span>
                   <span>
-                    <span className="block text-xs font-bold uppercase tracking-[0.14em] text-subtle">{label}</span>
+                    <span className="block font-mono text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-subtle">{label}</span>
                     <span className="block font-bold">{value}</span>
                   </span>
                 </>

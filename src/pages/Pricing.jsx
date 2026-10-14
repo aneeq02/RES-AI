@@ -34,7 +34,7 @@ function PlanCard({ plan }) {
       }`}
     >
       {popular && (
-        <span className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-brand px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-on-brand">
+        <span className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-brand px-4 py-1.5 font-mono text-[0.7rem] font-bold uppercase tracking-[0.14em] text-on-brand">
           Most popular
         </span>
       )}
@@ -87,7 +87,7 @@ export default function Pricing() {
   return (
     <>
       <section className="container-page pb-20 pt-32 md:pt-40">
-        <SectionHeading as="h1" eyebrow="Limited-time pricing" title={<>Choose <span className="text-brand-ink">res</span> at a price that fits you</>}>
+        <SectionHeading as="h1" eyebrow="Limited-time pricing" title={<>Choose <span className="hl">res</span> at a price that fits you</>}>
           One subscription, every specialist as they launch. Commit longer, pay less.
         </SectionHeading>
 

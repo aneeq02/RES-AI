@@ -18,7 +18,7 @@ export default function About() {
   return (
     <>
       <section className="container-page pb-20 pt-32 md:pt-40">
-        <SectionHeading as="h1" eyebrow="Our story" title={<>We build the workforce <span className="text-brand-ink">of the future.</span></>}>
+        <SectionHeading as="h1" eyebrow="Our story" title={<>We build the workforce <span className="hl">of the future.</span></>}>
           res started with a simple frustration: small teams drowning in repetitive work they couldn't afford to hire for.
         </SectionHeading>
       </section>

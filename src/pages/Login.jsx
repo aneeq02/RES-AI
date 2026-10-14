@@ -56,7 +56,7 @@ export default function Login({ mode = "login" }) {
           </div>
         ) : (
           <>
-            <h1 className="text-3xl font-bold tracking-tight">{isSignup ? "Create your account" : "Welcome back"}</h1>
+            <h1 className="text-3xl font-extrabold tracking-[-0.03em]">{isSignup ? "Create your account" : "Welcome back"}</h1>
             <p className="mt-2 text-sm text-muted">{isSignup ? "Your AI team is a few minutes away." : "Sign in to your res workspace."}</p>
             <button type="button" onClick={google} className="btn-secondary mt-8 w-full">Continue with Google</button>
             <div className="my-6 flex items-center gap-3 text-xs uppercase tracking-[0.16em] text-subtle">

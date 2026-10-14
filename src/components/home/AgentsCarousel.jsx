@@ -73,7 +73,7 @@ export default function AgentsCarousel({
               <div className="flex items-baseline justify-between gap-3">
                 <h3 className="text-2xl font-bold tracking-tight">{m.name}</h3>
               </div>
-              <p className="mt-1 text-sm font-bold uppercase tracking-[0.12em] text-brand-ink">{m.role}</p>
+              <p className="mt-1 font-mono text-xs font-semibold uppercase tracking-[0.12em] text-brand-ink">{m.role}</p>
               <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-ink-soft">{m.description}</p>
               <Link
                 to={`/agents#${m.id}`}

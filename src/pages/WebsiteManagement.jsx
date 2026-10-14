@@ -6,7 +6,7 @@ export default function WebsiteManagement() {
   return (
     <ServiceDetail
       eyebrow="Digital presence"
-      title={<>Website management & <span className="text-brand-ink">growth.</span></>}
+      title={<>Website management & <span className="hl">growth.</span></>}
       intro="Your website is your most important employee. We keep it fast, secure, and constantly evolving with full-stack development and proactive maintenance."
       outcomes={[
         { value: "99.9%", label: "Uptime target" },

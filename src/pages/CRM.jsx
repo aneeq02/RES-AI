@@ -6,7 +6,7 @@ export default function CRM() {
   return (
     <ServiceDetail
       eyebrow="Intelligent pipelines"
-      title={<>CRM solutions that <span className="text-brand-ink">close deals.</span></>}
+      title={<>CRM solutions that <span className="hl">close deals.</span></>}
       intro="Stop losing leads to slow responses. Our AI-powered CRM systems plug into your workflow so every opportunity is captured, nurtured, and converted automatically."
       outcomes={[
         { value: "< 1 min", label: "Lead response time" },

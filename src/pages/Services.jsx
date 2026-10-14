@@ -35,7 +35,7 @@ export default function Services() {
   return (
     <>
       <section className="container-page pb-10 pt-32 md:pt-40">
-        <SectionHeading as="h1" eyebrow="What we do" title="Our services">
+        <SectionHeading as="h1" eyebrow="What we do" title={<>Our <span className="hl">services</span></>}>
           Everything you need to automate your workflow — from AI employees to the systems they run on.
         </SectionHeading>
 

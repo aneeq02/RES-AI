@@ -38,7 +38,7 @@ function AgentCard({ m }) {
           <h2 className="text-3xl font-bold tracking-tight">{m.name}</h2>
           {!live && <span className="rounded-full bg-ink/5 px-2.5 py-1 text-xs font-bold text-subtle">Coming soon</span>}
         </div>
-        <p className="mt-1 text-sm font-bold uppercase tracking-[0.12em] text-brand-ink">{m.role}</p>
+        <p className="mt-1 font-mono text-xs font-semibold uppercase tracking-[0.12em] text-brand-ink">{m.role}</p>
         <p className="mt-4 text-sm leading-relaxed text-ink-soft">{m.description}</p>
 
         <ul className="mt-5 space-y-2">
@@ -77,7 +77,7 @@ export default function Agents() {
   return (
     <>
       <section className="container-page pb-10 pt-32 md:pt-40">
-        <SectionHeading as="h1" eyebrow="Your future team" title={<>Meet the <span className="text-brand-ink">specialists</span></>}>
+        <SectionHeading as="h1" eyebrow="Your future team" title={<>Meet the <span className="hl">specialists</span></>}>
           Each specialist is built for one job: faster execution, consistent quality, zero downtime. Every plan includes each specialist as they launch, starting with Buddy.
         </SectionHeading>
 

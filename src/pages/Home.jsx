@@ -80,16 +80,6 @@ const BENEFITS = [
 function Hero() {
   return (
     <section className="relative isolate overflow-hidden pt-28 md:pt-32">
-      {/* Faint blueprint grid that fades out toward the edges */}
-      <div
-        className="pointer-events-none absolute inset-0 -z-10 opacity-[0.5] [mask-image:radial-gradient(70%_60%_at_50%_30%,#000,transparent)]"
-        style={{
-          backgroundImage:
-            "linear-gradient(var(--c-line) 1px, transparent 1px), linear-gradient(90deg, var(--c-line) 1px, transparent 1px)",
-          backgroundSize: "56px 56px",
-        }}
-        aria-hidden="true"
-      />
       <div className="container-page grid items-center gap-12 pb-16 lg:grid-cols-[1.1fr_1fr] lg:gap-16 lg:pb-24">
         {/* No entrance fade: the headline is the LCP element and must paint immediately from the prerendered HTML */}
         <div>
@@ -218,7 +208,7 @@ export default function Home() {
               <div className="grid h-12 w-12 place-items-center rounded-2xl bg-brand text-on-brand">
                 <Icon size={22} aria-hidden="true" />
               </div>
-              <p className="mt-6 text-xs font-bold uppercase tracking-[0.16em] text-subtle">Step {i + 1}</p>
+              <p className="mt-6 font-mono text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-subtle">Step {i + 1}</p>
               <h3 className="mt-2 text-2xl font-bold tracking-tight">{title}</h3>
               <p className="mt-3 leading-relaxed text-muted">{body}</p>
             </motion.li>
@@ -241,7 +231,7 @@ export default function Home() {
                   </div>
                   <ArrowRight size={22} className="text-subtle transition group-hover:translate-x-1 group-hover:text-ink" aria-hidden="true" />
                 </div>
-                <p className="mt-8 text-xs font-bold uppercase tracking-[0.16em] text-subtle">{eyebrow}</p>
+                <p className="mt-8 font-mono text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-subtle">{eyebrow}</p>
                 <h3 className="mt-2 text-3xl font-bold tracking-tight">{title}</h3>
                 <p className="mt-3 text-muted">{body}</p>
               </Link>

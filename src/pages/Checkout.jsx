@@ -54,7 +54,7 @@ function Summary({ plan, agent }) {
   const total = plan.price * plan.months;
   return (
     <aside className="card h-fit p-6 md:p-8 lg:sticky lg:top-28" aria-label="Order summary">
-      <h2 className="font-sans text-xs font-bold uppercase tracking-[0.16em] text-subtle">Order summary</h2>
+      <h2 className="font-mono text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-subtle">Order summary</h2>
 
       {agent && (
         <div className="mt-5 flex items-center gap-4 rounded-2xl border border-line bg-canvas/40 p-3">
