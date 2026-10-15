@@ -30,7 +30,7 @@ function PlanCard({ plan }) {
       className={`relative flex flex-col rounded-[2rem] border p-7 md:p-8 ${
         popular
           ? "order-first border-2 border-brand bg-surface-3 shadow-[0_0_60px_rgba(220,38,38,0.2)] md:order-none lg:-my-4 lg:py-12"
-          : "border-line bg-surface-2/70 transition duration-300 hover:border-brand/40"
+          : "border-line bg-surface-2 transition duration-300 hover:border-brand/40"
       }`}
     >
       {popular && (
@@ -66,7 +66,7 @@ function PlanCard({ plan }) {
         <Link
           to={`/checkout?plan=${plan.id}`}
           className={`${popular ? "btn-primary" : "btn-secondary"} mt-7 w-full`}
-          aria-label={`Get res — ${plan.name}`}
+          aria-label={`Get res, ${plan.name}`}
         >
           Get res <ArrowRight size={18} aria-hidden="true" />
         </Link>

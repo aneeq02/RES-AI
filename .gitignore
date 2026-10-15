@@ -33,3 +33,4 @@ server/node_modules
 
 # Python bytecode
 __pycache__/
+.vercel

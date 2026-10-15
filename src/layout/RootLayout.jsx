@@ -19,15 +19,6 @@ export default function RootLayout() {
 
   return (
     <div className="relative flex min-h-screen flex-col overflow-x-clip text-ink">
-      {/* Blueprint grid behind the top of every page, fading out toward the edges */}
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[820px] opacity-50 [mask-image:radial-gradient(70%_70%_at_50%_20%,#000,transparent)]"
-        style={{
-          backgroundImage: "linear-gradient(var(--c-line) 1px, transparent 1px), linear-gradient(90deg, var(--c-line) 1px, transparent 1px)",
-          backgroundSize: "56px 56px",
-        }}
-        aria-hidden="true"
-      />
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[10001] focus:rounded-full focus:bg-ink focus:px-5 focus:py-3 focus:text-sm focus:font-bold focus:text-canvas"

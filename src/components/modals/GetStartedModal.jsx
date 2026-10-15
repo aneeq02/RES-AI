@@ -33,7 +33,7 @@ export default function GetStartedModal({ isOpen, onClose }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-canvas/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-canvas/70"
             aria-hidden="true"
           />
           <motion.div

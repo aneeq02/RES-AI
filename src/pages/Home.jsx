@@ -53,26 +53,8 @@ const INTEGRATIONS = [
   { name: "Webhooks", note: "Custom flows", icon: Webhook },
 ];
 
-const TESTIMONIALS = [
-  {
-    quote: "The biggest win is speed. I used to batch work on weekends — now tasks ship daily without feeling heavy.",
-    name: "Founder, eCom brand",
-    meta: "Karachi · 3 weeks in",
-  },
-  {
-    quote: "Support replies are consistent and calm. Our response time dropped and we stopped missing messages.",
-    name: "Ops Lead",
-    meta: "Dubai · Team of 6",
-  },
-  {
-    quote: "We finally have clarity. Weekly metrics are readable, and priorities don't get lost anymore.",
-    name: "Growth Manager",
-    meta: "London · B2B SaaS",
-  },
-];
-
 const BENEFITS = [
-  { icon: Clock, title: "Never off the clock", body: "Nights, weekends, holidays — work keeps moving." },
+  { icon: Clock, title: "Never off the clock", body: "Nights, weekends, holidays: work keeps moving." },
   { icon: ShieldCheck, title: "Human in the loop", body: "Approve anything before it goes out." },
   { icon: Sparkles, title: "Sounds like you", body: "Trained on your brand voice and examples." },
 ];
@@ -84,13 +66,13 @@ function Hero() {
         {/* No entrance fade: the headline is the LCP element and must paint immediately from the prerendered HTML */}
         <div>
           <span className="eyebrow mb-6">
-            <span className="h-2 w-2 animate-pulse-ring rounded-full bg-brand" aria-hidden="true" /> Always-on AI teammates
+            Always-on AI teammates
           </span>
           <h1 className="text-[clamp(2.9rem,7.4vw,6rem)] font-extrabold leading-[0.92] tracking-[-0.04em]">
             AI employees that <span className="hl">never sleep.</span>
           </h1>
           <p className="mt-6 max-w-lg animate-rise text-lg leading-relaxed text-ink-soft [animation-delay:120ms] md:text-xl">
-            Build, grow, and scale with specialists that handle the repetitive work — so your human team stays focused on what matters.
+            Build, grow, and scale with specialists that handle the repetitive work, so your human team stays focused on what matters.
           </p>
 
           <div className="mt-10 flex animate-rise flex-col gap-3 [animation-delay:220ms] sm:flex-row">
@@ -102,14 +84,6 @@ function Hero() {
             </Link>
           </div>
 
-          <ul className="mt-10 grid max-w-lg animate-rise grid-cols-3 gap-4 [animation-delay:320ms]">
-            {BENEFITS.map(({ icon: Icon, title }) => (
-              <li key={title} className="flex items-start gap-2 text-sm text-ink-soft">
-                <Icon size={18} className="mt-0.5 shrink-0 text-brand-ink" aria-hidden="true" />
-                {title}
-              </li>
-            ))}
-          </ul>
         </div>
 
         <motion.div
@@ -125,17 +99,6 @@ function Hero() {
               className="h-full w-full object-cover"
               style={{ objectPosition: "75% center" }}
             />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-canvas/50 to-transparent" aria-hidden="true" />
-          </div>
-          {/* Floating status card */}
-          <div className="absolute -bottom-6 -left-4 flex animate-float items-center gap-3 rounded-2xl border border-line bg-surface-2/90 px-4 py-3 shadow-xl backdrop-blur-md sm:-left-8">
-            <div className="grid h-10 w-10 place-items-center rounded-xl bg-ok/15 text-ok">
-              <Zap size={18} aria-hidden="true" />
-            </div>
-            <div>
-              <p className="text-sm font-bold">1,284 tasks done</p>
-              <p className="text-xs text-subtle">while you slept</p>
-            </div>
           </div>
         </motion.div>
       </div>
@@ -169,7 +132,7 @@ export default function Home() {
         <div className="container-page grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
           <div>
             <SectionHeading align="left" eyebrow="See it work" title={<>Tell them what to do.<br /><span className="hl">They do it.</span></>}>
-              Simple prompts, structured output. Refine, approve, and ship — without the back-and-forth.
+              Simple prompts, structured output. Refine, approve, and ship. No back-and-forth.
             </SectionHeading>
             <RevealOnScroll delay={0.1}>
               <ul className="mt-8 space-y-4">
@@ -202,9 +165,6 @@ export default function Home() {
         <motion.ol {...inViewStagger} className="mt-14 grid gap-6 md:grid-cols-3">
           {STEPS.map(({ icon: Icon, title, body }, i) => (
             <motion.li key={title} variants={itemStagger} className="card relative overflow-hidden p-8">
-              <span className="absolute -right-4 -top-8 select-none font-display text-[140px] font-bold leading-none text-ink/[0.04]" aria-hidden="true">
-                {String(i + 1).padStart(2, "0")}
-              </span>
               <div className="grid h-12 w-12 place-items-center rounded-2xl bg-brand text-on-brand">
                 <Icon size={22} aria-hidden="true" />
               </div>
@@ -221,7 +181,7 @@ export default function Home() {
         <div className="grid gap-6 md:grid-cols-2">
           {[
             { to: "/crm", eyebrow: "Service", title: "CRM that closes deals", body: "Automated outreach, lead scoring, and a pipeline that never forgets a follow-up.", icon: MessageSquare },
-            { to: "/website-management", eyebrow: "Service", title: "Websites that never sleep", body: "Monitoring, speed, security, and new features — handled by our team.", icon: ShieldCheck },
+            { to: "/website-management", eyebrow: "Service", title: "Websites that never sleep", body: "Monitoring, speed, security, and new features, handled by our team.", icon: ShieldCheck },
           ].map(({ to, eyebrow, title, body, icon: Icon }) => (
             <RevealOnScroll key={to}>
               <Link to={to} className="card card-hover group flex h-full flex-col p-8 md:p-10">
@@ -266,34 +226,6 @@ export default function Home() {
             ))}
           </motion.ul>
         </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="container-page py-20 md:py-28">
-        <SectionHeading eyebrow="Customers" title={<>Real teams. <span className="hl">Real output.</span></>}>
-          The goal isn't "more AI". The goal is less friction and more progress.
-        </SectionHeading>
-
-        <motion.ul {...inViewStagger} className="mt-14 grid gap-6 md:grid-cols-3">
-          {TESTIMONIALS.map((t) => (
-            <motion.li key={t.name} variants={itemStagger} className="card flex flex-col p-8">
-              <figure className="flex h-full flex-col">
-                <div className="mb-5 flex gap-1 text-brand-ink" aria-label="5 out of 5 stars">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <svg key={i} viewBox="0 0 20 20" className="h-4 w-4 fill-current" aria-hidden="true">
-                      <path d="M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 14.8l-5.2 2.8 1-5.8L1.5 7.7l5.9-.9L10 1.5z" />
-                    </svg>
-                  ))}
-                </div>
-                <blockquote className="flex-1 text-lg leading-relaxed text-ink-soft">"{t.quote}"</blockquote>
-                <figcaption className="mt-6 border-t border-line pt-5">
-                  <p className="font-bold">{t.name}</p>
-                  <p className="mt-1 text-sm text-subtle">{t.meta}</p>
-                </figcaption>
-              </figure>
-            </motion.li>
-          ))}
-        </motion.ul>
       </section>
 
       <CTASection />

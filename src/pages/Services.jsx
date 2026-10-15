@@ -11,7 +11,7 @@ const SERVICES = [
     to: "/agents",
     icon: Bot,
     title: "AI Agents",
-    body: "Meet our team of 12 AI employees — social, support, sales, SEO, data and more — ready to work for you 24/7.",
+    body: "Meet our team of 12 AI employees, social, support, sales, SEO, data and more, ready to work for you 24/7.",
     points: ["12 specialists", "Brand-voice trained", "From $15.60/mo"],
     featured: true,
   },
@@ -36,7 +36,7 @@ export default function Services() {
     <>
       <section className="container-page pb-10 pt-32 md:pt-40">
         <SectionHeading as="h1" eyebrow="What we do" title={<>Our <span className="hl">services</span></>}>
-          Everything you need to automate your workflow — from AI employees to the systems they run on.
+          Everything you need to automate your workflow, from AI employees to the systems they run on.
         </SectionHeading>
 
         <motion.ul {...inViewStagger} className="mt-16 grid gap-6 lg:grid-cols-3">
@@ -45,7 +45,7 @@ export default function Services() {
               <Link
                 to={to}
                 className={`group flex h-full flex-col rounded-[2rem] border p-8 transition duration-300 md:p-10 ${
-                  featured ? "border-brand/50 bg-gradient-to-b from-brand/15 to-surface-2" : "border-line bg-surface-2/70 hover:border-brand/40 hover:bg-surface-3"
+                  featured ? "border-brand/60 bg-surface-2" : "border-line bg-surface-2 hover:border-brand/40 hover:bg-surface-3"
                 }`}
               >
                 <div className="flex items-start justify-between">

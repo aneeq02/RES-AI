@@ -29,7 +29,7 @@ export default function MobileMenu({ isOpen, onClose, onOpenGetStarted }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0, transition: { duration: 0.15 } }}
-          className="fixed inset-0 top-18 z-[9998] flex flex-col overflow-y-auto bg-canvas/95 px-6 pb-8 pt-6 backdrop-blur-xl md:top-20 lg:hidden"
+          className="fixed inset-0 top-18 z-[9998] flex flex-col overflow-y-auto bg-canvas px-6 pb-8 pt-6 md:top-20 lg:hidden"
         >
           <motion.ul
             className="flex flex-col gap-1"

@@ -63,7 +63,7 @@ export default function Footer() {
         res.
       </p>
 
-      <div className="relative border-t border-line bg-canvas/40 backdrop-blur-sm">
+      <div className="relative border-t border-line bg-canvas/40">
         <div className="container-page flex flex-col gap-2 py-6 text-xs text-subtle sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} res. All rights reserved.</p>
           <p>Built for teams that never stop.</p>

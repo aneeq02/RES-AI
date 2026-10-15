@@ -26,7 +26,7 @@ export default function CRM() {
         },
         {
           icon: Plug,
-          title: "Seamless integration",
+          title: "Fits your current tools",
           body: "Works where you work. Connects with Slack, Gmail, Outlook, HubSpot, and Salesforce without disrupting your current operations.",
         },
         {
@@ -37,7 +37,7 @@ export default function CRM() {
       ]}
       process={{
         title: "From first click to closed deal.",
-        body: "We set up, migrate, and automate your pipeline — then keep improving it.",
+        body: "We set up, migrate, and automate your pipeline, then keep improving it.",
         steps: [
           { title: "Audit & plan", body: "We map your current sales process and find where leads are slipping through.", points: ["Pipeline review", "Tool audit"] },
           { title: "Build & migrate", body: "Your CRM is configured, your data moved over, and automations switched on.", points: ["Data migration", "Custom stages"] },

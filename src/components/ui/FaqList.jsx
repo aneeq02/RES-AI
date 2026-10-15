@@ -4,7 +4,7 @@ import { Plus } from "lucide-react";
 function FaqItem({ q, a, open, onToggle }) {
   const id = useId();
   return (
-    <li className={`rounded-3xl border transition-colors duration-200 ${open ? "border-brand/40 bg-surface-3" : "border-line bg-surface-2/60 hover:border-line-strong"}`}>
+    <li className={`rounded-3xl border transition-colors duration-200 ${open ? "border-brand/40 bg-surface-3" : "border-line bg-surface-2 hover:border-line-strong"}`}>
       <h3 className="font-sans">
         <button
           type="button"

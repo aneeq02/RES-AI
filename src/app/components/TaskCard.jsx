@@ -61,7 +61,7 @@ export default function TaskCard({ initialTask, canStart, onRetried }) {
   };
 
   return (
-    <div className={`mt-3 rounded-2xl border border-l-[3px] border-line bg-surface-2/60 p-4 backdrop-blur-sm ${STRIPE[task.status] ?? "border-l-line-strong"}`}>
+    <div className={`mt-3 rounded-2xl border border-l-[3px] border-line bg-surface-2 p-4 ${STRIPE[task.status] ?? "border-l-line-strong"}`}>
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <p className="font-display text-lg font-bold tracking-tight">{task.label}</p>
         <p className="font-mono text-[0.7rem] text-subtle">
@@ -97,7 +97,7 @@ export default function TaskCard({ initialTask, canStart, onRetried }) {
       {(task.status === "queued" || task.status === "running") && <div className="mt-4"><TaskProgress task={task} events={events} /></div>}
 
       {task.status === "done" && deliverable && (
-        <Link to={`/app/deliverables/${deliverable.id}`} className="spot mt-4 flex items-center gap-3 rounded-xl border border-line bg-canvas/40 p-3 text-sm transition hover:border-brand/50">
+        <Link to={`/app/deliverables/${deliverable.id}`} className="mt-4 flex items-center gap-3 rounded-xl border border-line bg-canvas p-3 text-sm transition hover:border-brand/50">
           <FileText size={18} className="text-brand-ink" aria-hidden="true" />
           <span className="font-bold">{deliverable.title}</span>
           {deliverable.partial && <span className="rounded-full bg-accent/15 px-2 py-0.5 text-xs font-semibold text-accent">Partial</span>}

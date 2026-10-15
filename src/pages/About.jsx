@@ -10,7 +10,7 @@ import { inViewStagger, itemStagger } from "../animations/variants";
 const VALUES = [
   { icon: Rocket, title: "Speed over ceremony", body: "Hiring takes months. Onboarding an AI specialist takes minutes." },
   { icon: HeartHandshake, title: "Humans stay in charge", body: "Agents draft, you decide. Approvals are built into every workflow." },
-  { icon: Lock, title: "Private by default", body: "Your data trains your agents only — never public models." },
+  { icon: Lock, title: "Private by default", body: "Your data trains your agents only, never public models." },
   { icon: Globe, title: "Talent without borders", body: "World-class skills available to every business, in every time zone." },
 ];
 
@@ -37,7 +37,7 @@ export default function About() {
               compliant, and ready to work from day one.
             </p>
             <p>
-              We're not replacing your team — we're taking the repetitive work off their plate so they can do the thinking, the relationships,
+              We're not replacing your team, we're taking the repetitive work off their plate so they can do the thinking, the relationships,
               and the creative work only people can do.
             </p>
           </div>

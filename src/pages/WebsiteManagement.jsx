@@ -17,7 +17,7 @@ export default function WebsiteManagement() {
         {
           icon: ShieldCheck,
           title: "24/7 uptime & security monitoring",
-          body: "We watch your site so you don't have to — instant alerts for downtime and proactive defence against threats and vulnerabilities.",
+          body: "We watch your site so you don't have to, instant alerts for downtime and proactive defence against threats and vulnerabilities.",
         },
         {
           icon: Gauge,
@@ -37,11 +37,11 @@ export default function WebsiteManagement() {
       ]}
       process={{
         title: "A website that looks after itself.",
-        body: "Hand over the technical headaches — we run your site like it's our own.",
+        body: "Hand over the technical headaches, we run your site like it's our own.",
         steps: [
           { title: "Health check", body: "A full audit of speed, security, SEO, and accessibility with a prioritized fix list.", points: ["Lighthouse audit", "Security scan"] },
           { title: "Fix & improve", body: "We clear the backlog, harden security, and ship quick performance wins.", points: ["Core Web Vitals", "Backups"] },
-          { title: "Ongoing care", body: "Monthly updates, monitoring, and new features on request — with clear reporting.", points: ["Monthly report", "Priority support"] },
+          { title: "Ongoing care", body: "Monthly updates, monitoring, and new features on request, with clear reporting.", points: ["Monthly report", "Priority support"] },
         ],
       }}
       cta={{

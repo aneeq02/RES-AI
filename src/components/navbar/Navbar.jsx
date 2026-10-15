@@ -71,7 +71,7 @@ function ServicesMenu() {
             transition={{ duration: 0.18 }}
             className="absolute left-1/2 top-full w-80 -translate-x-1/2 pt-3"
           >
-            <div className="rounded-3xl border border-line bg-surface-2/95 p-2 shadow-2xl shadow-black/40 backdrop-blur-xl">
+            <div className="rounded-3xl border border-line bg-surface-2 p-2 shadow-2xl shadow-black/40">
               {SERVICE_LINKS.map((l) => (
                 <Link
                   key={l.to}
@@ -121,7 +121,7 @@ export default function Navbar() {
     <>
       <header
         className={`fixed inset-x-0 top-0 z-[9999] transition-[background-color,border-color,backdrop-filter] duration-300 ${
-          solid ? "border-b border-line bg-canvas/70 backdrop-blur-xl" : "border-b border-transparent bg-transparent"
+          solid ? "border-b border-line bg-canvas/70" : "border-b border-transparent bg-transparent"
         }`}
       >
         <nav aria-label="Main" className="container-page flex h-18 items-center justify-between md:h-20">

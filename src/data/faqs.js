@@ -4,7 +4,7 @@ export const FAQ_GROUPS = [
     items: [
       {
         q: "How do res agents integrate with my tools?",
-        a: "Our agents connect directly with your existing stack — Slack, Gmail, HubSpot, Notion and more. Setup takes less than 5 minutes and needs no engineering help.",
+        a: "Our agents connect directly with your existing stack, Slack, Gmail, HubSpot, Notion and more. Setup takes less than 5 minutes and needs no engineering help.",
       },
       {
         q: "Do I need to know how to code?",
@@ -42,7 +42,7 @@ export const FAQ_GROUPS = [
       },
       {
         q: "Do you offer CRM or website work separately?",
-        a: "Yes — our CRM and Website Management services can be bought on their own or alongside an agent plan. Contact us for a quote.",
+        a: "Yes, our CRM and Website Management services can be bought on their own or alongside an agent plan. Contact us for a quote.",
       },
     ],
   },

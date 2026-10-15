@@ -21,18 +21,6 @@ const clientOnly = window.location.pathname.startsWith("/app");
 // URLs, and /app (often served a marketing page's HTML by SPA fallbacks) sets its own.
 removeSsrHead();
 
-// Cursor spotlight: feed the pointer position to whichever .spot element it is over.
-document.addEventListener(
-  "pointermove",
-  (e) => {
-    const el = e.target instanceof Element ? e.target.closest(".spot") : null;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    el.style.setProperty("--mx", `${e.clientX - r.left}px`);
-    el.style.setProperty("--my", `${e.clientY - r.top}px`);
-  },
-  { passive: true },
-);
 if (container.firstElementChild && !clientOnly) {
   ReactDOM.hydrateRoot(container, app);
 } else {

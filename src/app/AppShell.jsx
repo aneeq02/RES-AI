@@ -20,7 +20,7 @@ export default function AppShell() {
   return (
     <div className="min-h-screen text-ink">
       <a href="#app-main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-ink focus:px-5 focus:py-3 focus:text-sm focus:font-bold focus:text-canvas">Skip to content</a>
-      <header className="sticky top-0 z-40 border-b border-line bg-canvas/60 backdrop-blur-xl">
+      <header className="sticky top-0 z-40 border-b border-line bg-canvas/60">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 sm:gap-x-4 md:px-6">
           <NavLink to="/app" aria-label="res workspace home" className="mr-auto sm:mr-0"><Logo className="text-3xl" /></NavLink>
           <nav aria-label="Workspace" className="order-last flex w-full gap-1 overflow-x-auto sm:order-none sm:w-auto sm:flex-1">

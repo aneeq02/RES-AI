@@ -1,4 +1,4 @@
-// AI specialists. `img` is optional — an agent without artwork renders a role-icon avatar.
+// AI specialists. `img` is optional, an agent without artwork renders a role-icon avatar.
 // `icon` is a lucide-react icon name resolved in components/agents/AgentAvatar.jsx.
 export const members = [
   {

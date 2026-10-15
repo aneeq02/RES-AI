@@ -62,7 +62,7 @@ export default function AgentsCarousel({
           <article
             key={m.id}
             data-card
-            className="group flex w-[80%] shrink-0 snap-start flex-col overflow-hidden rounded-[2rem] border border-line bg-surface-2/70 transition duration-300 hover:border-brand/40 sm:w-[46%] md:w-[36%] lg:w-[27%] xl:w-[23%]"
+            className="group flex w-[80%] shrink-0 snap-start flex-col overflow-hidden rounded-[2rem] border border-line bg-surface-2 transition duration-300 hover:border-brand/40 sm:w-[46%] md:w-[36%] lg:w-[27%] xl:w-[23%]"
           >
             <AgentAvatar
               member={m}

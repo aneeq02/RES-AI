@@ -59,7 +59,7 @@ export default function AutoVideo({ src, className = "", style, label, showContr
         <button
           type="button"
           onClick={toggle}
-          className="absolute bottom-4 right-4 z-10 grid h-11 w-11 place-items-center rounded-full border border-ink/20 bg-canvas/60 text-ink backdrop-blur transition hover:bg-canvas/80"
+          className="absolute bottom-4 right-4 z-10 grid h-11 w-11 place-items-center rounded-full border border-ink/20 bg-canvas text-ink transition hover:bg-canvas/80"
           aria-label={playing ? "Pause video" : "Play video"}
         >
           {playing ? <Pause size={16} aria-hidden="true" /> : <Play size={16} aria-hidden="true" />}

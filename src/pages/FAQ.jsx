@@ -25,7 +25,7 @@ export default function FAQ() {
 
       <CTASection
         title="Didn't find your answer?"
-        body="Our team replies within one business day — usually much faster."
+        body="Our team replies within one business day, usually much faster."
         primary={{ to: "/contact", label: "Contact us" }}
         secondary={{ to: "/pricing", label: "See pricing" }}
       />

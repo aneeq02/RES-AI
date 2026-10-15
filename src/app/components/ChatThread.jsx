@@ -86,7 +86,7 @@ export default function ChatThread({ threadId, agent, canChat, starter, onActivi
     if (b.type === "deliverable" && data.deliverables[b.deliverableId]) {
       const d = data.deliverables[b.deliverableId];
       return (
-        <Link key={i} to={`/app/deliverables/${d.id}`} className="spot mt-3 flex items-center gap-3 rounded-xl border border-line bg-surface-2/60 p-3 text-sm transition hover:border-brand/50">
+        <Link key={i} to={`/app/deliverables/${d.id}`} className="mt-3 flex items-center gap-3 rounded-xl border border-line bg-surface-2 p-3 text-sm transition hover:border-brand/50">
           <FileText size={18} className="text-brand-ink" aria-hidden="true" /> <span><span className="font-bold">Report ready:</span> {d.title}</span>
         </Link>
       );
@@ -125,7 +125,7 @@ export default function ChatThread({ threadId, agent, canChat, starter, onActivi
       {/* Announces each finished reply once, instead of re-reading the growing stream on every delta. */}
       <p role="status" className="sr-only">{announcement}</p>
       {error && <p className="field-error" role="alert">{error}</p>}
-      <form onSubmit={send} className="mt-4 flex items-end gap-2 rounded-3xl border border-line-strong bg-surface-2/70 p-2 backdrop-blur-md transition focus-within:border-brand-ink focus-within:ring-2 focus-within:ring-brand/20">
+      <form onSubmit={send} className="mt-4 flex items-end gap-2 rounded-3xl border border-line-strong bg-surface-2 p-2 transition focus-within:border-brand-ink focus-within:ring-2 focus-within:ring-brand/20">
         <label htmlFor="chat-input" className="sr-only">Message {agent.name}</label>
         <textarea id="chat-input" rows={1} value={draft} disabled={!canChat} maxLength={4000}
           onChange={(e) => setDraft(e.target.value)}

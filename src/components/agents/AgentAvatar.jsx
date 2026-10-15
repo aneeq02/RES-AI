@@ -23,7 +23,7 @@ export function AgentIcon({ name, ...props }) {
 }
 
 /**
- * Agent artwork on a soft gradient stage. Falls back to a role icon when the
+ * Agent artwork on a flat stage. Falls back to a role icon when the
  * agent has no image (or it fails to load) so every card looks intentional.
  */
 export default function AgentAvatar({ member, className = "", imgClassName = "", eager = false }) {
@@ -31,12 +31,7 @@ export default function AgentAvatar({ member, className = "", imgClassName = "",
   const showImage = member.img && !failed;
 
   return (
-    <div className={`relative overflow-hidden bg-surface ${className}`}>
-      <div className={`absolute inset-0 bg-gradient-to-br ${member.color} opacity-25`} aria-hidden="true" />
-      <div
-        className="absolute inset-x-0 bottom-0 h-2/3 bg-[radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.12),transparent_70%)]"
-        aria-hidden="true"
-      />
+    <div className={`relative overflow-hidden bg-surface-2 ${className}`}>
       {showImage ? (
         <img
           src={member.img}
@@ -51,7 +46,7 @@ export default function AgentAvatar({ member, className = "", imgClassName = "",
         />
       ) : (
         <div className="relative grid h-full w-full place-items-center">
-          <div className="grid h-24 w-24 place-items-center rounded-[1.75rem] border border-ink/15 bg-canvas/40 backdrop-blur-sm">
+          <div className="grid h-24 w-24 place-items-center rounded-[1.75rem] border border-ink/15 bg-canvas">
             <AgentIcon name={member.icon} size={40} strokeWidth={1.6} className="text-ink" />
           </div>
           <span className="sr-only">{`${member.name}, ${member.role}`}</span>

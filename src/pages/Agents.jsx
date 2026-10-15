@@ -26,7 +26,7 @@ function AgentCard({ m }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.97, transition: { duration: 0.15 } }}
       transition={{ duration: 0.35 }}
-      className="group grid scroll-mt-28 overflow-hidden rounded-[2rem] border border-line bg-surface-2/70 outline-none transition-colors duration-300 hover:border-brand/40 focus-visible:border-brand-ink sm:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]"
+      className="group grid scroll-mt-28 overflow-hidden rounded-[2rem] border border-line bg-surface-2 outline-none transition-colors duration-300 hover:border-brand/40 focus-visible:border-brand-ink sm:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]"
     >
       <AgentAvatar
         member={m}

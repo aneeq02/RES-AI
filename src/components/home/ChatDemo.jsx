@@ -10,14 +10,14 @@ const SCRIPT = [
   {
     from: "agent",
     agent: "soshie",
-    text: "Done! 7 posts drafted in your brand voice — 3 carousels, 2 reels, 2 stories. Best slots: Tue & Thu at 6 pm.",
+    text: "Done! 7 posts drafted in your brand voice, 3 carousels, 2 reels, 2 stories. Best slots: Tue & Thu at 6 pm.",
     tasks: ["Captions written", "Hashtags researched", "Scheduled in Buffer"],
   },
   { from: "user", text: "Cassie, anything urgent in support?" },
   {
     from: "agent",
     agent: "cassie",
-    text: "2 refund requests handled, 14 replies sent. One VIP customer flagged for you — draft reply is ready.",
+    text: "2 refund requests handled, 14 replies sent. One VIP customer flagged for you, draft reply is ready.",
     tasks: ["14 tickets closed", "Avg. reply 38 seconds"],
   },
 ];

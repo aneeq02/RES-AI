@@ -7,7 +7,7 @@ export default function RoleTicker() {
   const roles = members.map((m) => m.role);
   const row = [...roles, ...roles];
   return (
-    <div className="relative overflow-hidden border-y border-line bg-surface/60 py-4 [mask-image:linear-gradient(90deg,transparent,#000_8%,#000_92%,transparent)]" aria-hidden="true">
+    <div className="relative overflow-hidden border-y border-line bg-surface py-4 [mask-image:linear-gradient(90deg,transparent,#000_8%,#000_92%,transparent)]" aria-hidden="true">
       <div className="flex w-max animate-marquee gap-10 font-mono text-sm font-semibold uppercase tracking-[0.14em] text-muted">
         {row.map((role, i) => (
           <span key={i} className="flex items-center gap-10 whitespace-nowrap">
